@@ -1,0 +1,20 @@
+{
+  "pair": {
+    "title": "Logg inn på Withings",
+    "instructions": "Et Withings-innloggingsvindu åpnes. Gi tilgang til søvnhendelsene dine, og kom tilbake hit.",
+    "missing_credentials": "Withings client ID og secret er ikke satt. Åpne appinnstillingene og fyll dem inn først.",
+    "not_authorized": "Autorisering ble ikke fullført. Prøv igjen."
+  },
+  "settings": {
+    "credentials": "Legitimasjon",
+    "intro": "Fra Withings Partner Hub (Public API integration) og fra tools.developer.homey.app/webhooks.",
+    "withings": "Withings-applikasjon",
+    "client_id": "Client ID",
+    "client_secret": "Client secret",
+    "webhook": "Homey-webhook",
+    "webhook_id": "Webhook-ID",
+    "webhook_secret": "Webhook-secret",
+    "save": "Lagre",
+    "saved": "Lagret. Start appen på nytt eller legg til enheten igjen for å ta i bruk."
+  }
+}

@@ -1,0 +1,334 @@
+{
+  "id": "com.thomastorp.withings-sleep",
+  "version": "0.2.1",
+  "compatibility": ">=12.2.0",
+  "sdk": 3,
+  "platforms": ["local"],
+  "name": {
+    "en": "Withings Sleep",
+    "no": "Withings Sleep"
+  },
+  "description": {
+    "en": "Bed presence from the Withings Sleep Analyzer, with self-healing notification subscriptions.",
+    "no": "Sengetilstedeværelse fra Withings Sleep Analyzer, med selvreparerende varslingsabonnement."
+  },
+  "category": ["security"],
+  "brandColor": "#00857C",
+  "author": {
+    "name": "Thomas Torp"
+  },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "capabilities": {
+    "withings_in_bed": {
+      "type": "boolean",
+      "title": {
+        "en": "In bed",
+        "no": "I sengen"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/in-bed.svg"
+    },
+    "withings_subscription_ok": {
+      "type": "boolean",
+      "title": {
+        "en": "Notifications active",
+        "no": "Varsling aktiv"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/notifications.svg"
+    },
+    "withings_time_in_bed": {
+      "type": "number",
+      "title": {
+        "en": "Time in bed",
+        "no": "Tid i sengen"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "min",
+        "no": "min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/time-in-bed.svg"
+    },
+    "withings_time_out_of_bed": {
+      "type": "number",
+      "title": {
+        "en": "Time out of bed",
+        "no": "Tid ute av sengen"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "min",
+        "no": "min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/time-out-of-bed.svg"
+    },
+    "withings_last_sleep_duration": {
+      "type": "number",
+      "title": {
+        "en": "Last night in bed",
+        "no": "Siste natt i sengen"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "min",
+        "no": "min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/last-night.svg"
+    },
+    "withings_bedtime": {
+      "type": "string",
+      "title": {
+        "en": "Bedtime",
+        "no": "Leggetid"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/bedtime.svg"
+    },
+    "withings_wakeup_time": {
+      "type": "string",
+      "title": {
+        "en": "Got up",
+        "no": "Stod opp"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/wakeup.svg"
+    }
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "withings_bed_in",
+        "title": {
+          "en": "Someone gets into bed",
+          "no": "Noen legger seg i sengen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      },
+      {
+        "id": "withings_bed_out",
+        "title": {
+          "en": "Someone gets out of bed",
+          "no": "Noen står opp av sengen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      },
+      {
+        "id": "withings_subscription_lost",
+        "title": {
+          "en": "The Withings notification subscription is lost",
+          "no": "Withings-varslingsabonnementet mistes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "withings_is_in_bed",
+        "title": {
+          "en": "Someone !{{is|isn't}} in bed",
+          "no": "Noen !{{er|er ikke}} i sengen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "withings_resubscribe",
+        "title": {
+          "en": "Renew the Withings notification subscription",
+          "no": "Forny Withings-varslingsabonnementet"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "id": "sleep_analyzer",
+      "name": {
+        "en": "Sleep Analyzer",
+        "no": "Sleep Analyzer"
+      },
+      "class": "sensor",
+      "platforms": ["local"],
+      "connectivity": ["cloud"],
+      "capabilities": [
+        "withings_in_bed",
+        "withings_bedtime",
+        "withings_wakeup_time",
+        "withings_time_in_bed",
+        "withings_time_out_of_bed",
+        "withings_last_sleep_duration",
+        "withings_subscription_ok"
+      ],
+      "capabilitiesOptions": {
+        "withings_in_bed": {
+          "titleTrue": {
+            "en": "In bed",
+            "no": "I sengen"
+          },
+          "titleFalse": {
+            "en": "Out of bed",
+            "no": "Ute av sengen"
+          }
+        },
+        "withings_subscription_ok": {
+          "titleTrue": {
+            "en": "Active",
+            "no": "Aktiv"
+          },
+          "titleFalse": {
+            "en": "Lost",
+            "no": "Mistet"
+          }
+        }
+      },
+      "pair": [
+        {
+          "id": "start",
+          "navigation": {
+            "next": "list_devices"
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "id": "poll_interval_seconds",
+          "type": "number",
+          "label": {
+            "en": "Polling interval",
+            "no": "Pollingintervall"
+          },
+          "hint": {
+            "en": "Fallback polling when no webhook is configured, and the safety net that detects a lost subscription. Set to 0 to disable.",
+            "no": "Reservepolling når webhook ikke er satt opp, og sikkerhetsnettet som oppdager et mistet abonnement. Sett til 0 for å slå av."
+          },
+          "value": 60,
+          "min": 0,
+          "max": 3600,
+          "step": 10,
+          "units": {
+            "en": "s",
+            "no": "s"
+          }
+        },
+        {
+          "id": "bed_freshness_seconds",
+          "type": "number",
+          "label": {
+            "en": "Bed presence window",
+            "no": "Vindu for sengetilstedeværelse"
+          },
+          "hint": {
+            "en": "How recent the sleep data must be for the bed to count as occupied when polling.",
+            "no": "Hvor ferske søvndataene må være for at sengen skal regnes som opptatt ved polling."
+          },
+          "value": 300,
+          "min": 60,
+          "max": 1800,
+          "step": 30,
+          "units": {
+            "en": "s",
+            "no": "s"
+          }
+        },
+        {
+          "id": "resubscribe_hours",
+          "type": "number",
+          "label": {
+            "en": "Subscription check interval",
+            "no": "Intervall for abonnementssjekk"
+          },
+          "hint": {
+            "en": "How often to verify the bed-in and bed-out subscriptions still exist at Withings, and recreate them if not.",
+            "no": "Hvor ofte abonnementene for seng inn og seng ut verifiseres hos Withings, og gjenopprettes hvis de mangler."
+          },
+          "value": 6,
+          "min": 1,
+          "max": 168,
+          "step": 1,
+          "units": {
+            "en": "h",
+            "no": "t"
+          }
+        }
+      ],
+      "images": {
+        "small": "/drivers/sleep_analyzer/assets/images/small.png",
+        "large": "/drivers/sleep_analyzer/assets/images/large.png",
+        "xlarge": "/drivers/sleep_analyzer/assets/images/xlarge.png"
+      }
+    }
+  ]
+}

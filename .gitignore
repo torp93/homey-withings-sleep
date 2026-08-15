@@ -1,0 +1,6 @@
+node_modules/
+.homeybuild/
+env.json
+
+# Contains plaintext secrets. Packed into the app archive, never committed.
+lib/credentials.js

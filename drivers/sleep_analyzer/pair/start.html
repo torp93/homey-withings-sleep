@@ -1,0 +1,12 @@
+<script type="application/javascript">
+  Homey.setTitle(Homey.__('pair.title'));
+
+  // The driver emits the authorize URL as soon as the callback is registered.
+  Homey.on('url', url => Homey.popup(url));
+
+  Homey.on('authorized', () => Homey.showView('list_devices'));
+
+  Homey.on('error', message => Homey.alert(message, 'error'));
+</script>
+
+<p data-i18n="pair.instructions"></p>

@@ -1,0 +1,75 @@
+<script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+
+<h2 data-i18n="settings.credentials"></h2>
+<p data-i18n="settings.intro"></p>
+
+<fieldset>
+  <legend data-i18n="settings.withings"></legend>
+
+  <label for="clientId" data-i18n="settings.client_id"></label>
+  <input id="clientId" type="text" autocomplete="off" spellcheck="false" />
+
+  <label for="clientSecret" data-i18n="settings.client_secret"></label>
+  <input id="clientSecret" type="password" autocomplete="off" spellcheck="false" />
+</fieldset>
+
+<fieldset>
+  <legend data-i18n="settings.webhook"></legend>
+
+  <label for="webhookId" data-i18n="settings.webhook_id"></label>
+  <input id="webhookId" type="text" autocomplete="off" spellcheck="false" />
+
+  <label for="webhookSecret" data-i18n="settings.webhook_secret"></label>
+  <input id="webhookSecret" type="password" autocomplete="off" spellcheck="false" />
+</fieldset>
+
+<p>
+  <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
+</p>
+
+<p id="status"></p>
+
+<script type="application/javascript">
+  const FIELDS = {
+    clientId: 'WITHINGS_CLIENT_ID',
+    clientSecret: 'WITHINGS_CLIENT_SECRET',
+    webhookId: 'WEBHOOK_ID',
+    webhookSecret: 'WEBHOOK_SECRET'
+  };
+
+  function onHomeyReady(Homey) {
+    const status = document.getElementById('status');
+
+    // Load each stored value into its field.
+    Object.entries(FIELDS).forEach(([elementId, key]) => {
+      Homey.get(key, (err, value) => {
+        if (!err && value) document.getElementById(elementId).value = value;
+      });
+    });
+
+    document.getElementById('save').addEventListener('click', () => {
+      const entries = Object.entries(FIELDS);
+      let remaining = entries.length;
+      let failed = null;
+
+      entries.forEach(([elementId, key]) => {
+        const value = document.getElementById(elementId).value.trim();
+
+        Homey.set(key, value, err => {
+          if (err) failed = err;
+          remaining -= 1;
+
+          if (remaining === 0) {
+            if (failed) {
+              Homey.alert(failed);
+            } else {
+              status.textContent = Homey.__('settings.saved');
+            }
+          }
+        });
+      });
+    });
+
+    Homey.ready();
+  }
+</script>

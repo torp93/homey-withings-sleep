@@ -1,0 +1,20 @@
+{
+  "pair": {
+    "title": "Log in to Withings",
+    "instructions": "A Withings login window will open. Grant access to your sleep events, then return here.",
+    "missing_credentials": "Withings client ID and secret are not set. Open the app settings and enter them first.",
+    "not_authorized": "Authorization did not complete. Please try again."
+  },
+  "settings": {
+    "credentials": "Credentials",
+    "intro": "From the Withings Partner Hub (Public API integration) and from tools.developer.homey.app/webhooks.",
+    "withings": "Withings application",
+    "client_id": "Client ID",
+    "client_secret": "Client secret",
+    "webhook": "Homey webhook",
+    "webhook_id": "Webhook ID",
+    "webhook_secret": "Webhook secret",
+    "save": "Save",
+    "saved": "Saved. Restart the app or re-add the device to apply."
+  }
+}
