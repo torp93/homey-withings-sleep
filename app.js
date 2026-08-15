@@ -16,7 +16,7 @@ class WithingsSleepApp extends Homey.App {
 
     const missing = CONFIG_KEYS.filter(key => !this._config(key));
     if (missing.length) {
-      this.error(`Missing configuration: ${missing.join(', ')} — set these in the app settings.`);
+      this.error(`Missing configuration: ${missing.join(', ')}: set these in the app settings.`);
     }
 
     this.log(`Withings Sleep v${version} initialized (webhook: ${this.hasWebhookConfig ? 'configured' : 'not configured, polling only'})`);

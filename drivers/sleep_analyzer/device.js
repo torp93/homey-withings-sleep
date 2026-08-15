@@ -23,7 +23,7 @@ class SleepAnalyzerDevice extends Homey.Device {
     // first real event replaces this with a true timestamp.
     if (!this.getStoreValue('stateSince')) {
       await this.setStoreValue('stateSince', Date.now()).catch(this.error);
-      this.log('No previous state timestamp — anchoring duration counters to now.');
+      this.log('No previous state timestamp, anchoring duration counters to now.');
     }
 
     await this._setupWebhook();
@@ -78,7 +78,7 @@ class SleepAnalyzerDevice extends Homey.Device {
 
   async _setupWebhook() {
     if (!this.homey.app.hasWebhookConfig) {
-      this.log('No webhook configured — falling back to polling.');
+      this.log('No webhook configured, falling back to polling.');
       return;
     }
 
@@ -111,7 +111,7 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     const event = parseNotification(body);
     if (!event) {
-      this.error('Webhook payload not recognised as a bed event — ignored.');
+      this.error('Webhook payload not recognised as a bed event, ignored.');
       return;
     }
 

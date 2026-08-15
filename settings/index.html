@@ -223,15 +223,15 @@
 
         const source = res.source.settings ? 'app settings'
           : res.source.env ? 'env.json (Homey.env)'
-            : 'ingen kilde — client secret mangler';
+            : Homey.__('settings.no_source');
 
         const lines = [
-          `${res.withings.ok ? '✓' : '✗'} Withings — ${res.withings.message}`,
-          `${res.webhook.ok ? '✓' : '✗'} Webhook — ${res.webhook.message}`,
+          `${res.withings.ok ? '✓' : '✗'} Withings: ${res.withings.message}`,
+          `${res.webhook.ok ? '✓' : '✗'} Webhook: ${res.webhook.message}`,
           '',
-          `${Homey.__('settings.client_id')}: ${res.clientId || '—'}`,
+          `${Homey.__('settings.client_id')}: ${res.clientId || '?'}`,
           `${Homey.__('settings.source')}: ${source}`,
-          `Homey ID: ${res.homeyId || '—'}`
+          `Homey ID: ${res.homeyId || '?'}`
         ];
 
         // Without a webhook id there is no URL to register, so the hint would

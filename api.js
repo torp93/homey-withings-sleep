@@ -86,7 +86,7 @@ module.exports = {
     }
 
     if (!webhookId || !webhookSecret) {
-      result.webhook.message = 'Ikke satt opp — appen faller tilbake til polling.';
+      result.webhook.message = 'Ikke satt opp, appen faller tilbake til polling.';
     } else {
       try {
         const homeyId = result.homeyId;
