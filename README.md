@@ -18,9 +18,10 @@ visible instead of silent.
 
 ## Screenshots
 
-| Device | Insights |
-| --- | --- |
-| ![Device view](docs/screenshots/device.jpg) | ![Insights](docs/screenshots/insights.jpg) |
+<p>
+  <a href="docs/screenshots/device.jpg"><img src="docs/screenshots/device.jpg" alt="Device view" width="250"></a>
+  <a href="docs/screenshots/insights.jpg"><img src="docs/screenshots/insights.jpg" alt="Insights" width="250"></a>
+</p>
 
 ## Setup
 
