@@ -135,10 +135,8 @@ and every version needs a matching entry in `.homeychangelog.json`.
 
 Two things are still open before submitting:
 
-- **Artwork.** The app images in `assets/images/` are a Withings product
-  photograph, used with no licence from Withings. The driver images in
-  `drivers/sleep_analyzer/assets/` are still flat brand-colour placeholders.
-  Athom reviews artwork.
+- **Artwork.** The app and driver images are a Withings product photograph,
+  used with no licence from Withings. Athom reviews artwork.
 - **Brand name.** The app is called "Withings Sleep" and uses Withings' brand
   colour. Athom's guidelines restrict using a manufacturer's name and marks
   without permission; the store listing may need renaming.
