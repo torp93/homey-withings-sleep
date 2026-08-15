@@ -42,6 +42,7 @@
     "no_webhook_url": "No subscription URL yet. Fill in the Webhook ID and save, and it appears here.",
     "guide_step2_full": "Each installation subscribes with its own Homey id appended. The base URL above covers them all, so you normally do not need to register this one:",
     "no_source": "no source, client secret missing",
-    "env_probe": "Environment probe, which keys each source actually delivers:"
+    "env_probe": "Environment probe, which keys each source actually delivers:",
+    "renew_started": "Renewal started. Check the Notifications status on the device in a few seconds."
   }
 }

@@ -1,4 +1,8 @@
 {
+  "1.0.6": {
+    "en": "Device settings gain a Maintenance section with a manual subscription renewal, for when notifications show Lost and you do not want to wait for the scheduled check.",
+    "no": "Enhetsinnstillingene har fått en Vedlikehold-seksjon med manuell fornyelse av abonnementet, for når varsling viser Mistet og du ikke vil vente på den planlagte sjekken."
+  },
   "1.0.5": {
     "en": "Each installation now uses its own Withings application and Homey webhook, entered in the app settings. No credentials are shipped with the app.",
     "no": "Hver installasjon bruker nå sin egen Withings-applikasjon og Homey-webhook, lagt inn i appinnstillingene. Ingen legitimasjon følger med appen."

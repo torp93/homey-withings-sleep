@@ -292,9 +292,28 @@ class SleepAnalyzerDevice extends Homey.Device {
     this._durationTimer = null;
   }
 
-  async onSettings({ changedKeys }) {
+  async onSettings({ newSettings, changedKeys }) {
     if (changedKeys.some(key => key === 'poll_interval_seconds' || key === 'resubscribe_hours')) {
       this._startTimers();
+    }
+
+    // Homey's settings schema has no button type, so the renewal is a checkbox
+    // that acts on save and clears itself. The reset has to happen after this
+    // handler returns, or Homey overwrites it with the values being saved.
+    if (changedKeys.includes('renew_now') && newSettings.renew_now === true) {
+      this.homey.setTimeout(async () => {
+        await this.setSettings({ renew_now: false }).catch(this.error);
+
+        this.log('Manual subscription renewal requested from device settings.');
+        const ok = await this.renewSubscriptions().catch(err => {
+          this.error('Manual renewal failed:', err);
+          return false;
+        });
+
+        this.log(ok ? 'Manual renewal succeeded.' : 'Manual renewal did not complete.');
+      }, 1000);
+
+      return this.homey.__('settings.renew_started');
     }
   }
 

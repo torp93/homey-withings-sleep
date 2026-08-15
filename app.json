@@ -1,9 +1,11 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "compatibility": ">=12.2.0",
   "sdk": 3,
-  "platforms": ["local"],
+  "platforms": [
+    "local"
+  ],
   "name": {
     "en": "Withings Sleep",
     "no": "Withings Sleep"
@@ -12,11 +14,29 @@
     "en": "Bed presence from the Withings Sleep Analyzer, with self-healing notification subscriptions.",
     "no": "Sengetilstedeværelse fra Withings Sleep Analyzer, med selvreparerende varslingsabonnement."
   },
-  "category": ["security"],
+  "category": [
+    "security"
+  ],
   "brandColor": "#00857C",
   "tags": {
-    "en": ["withings", "sleep", "sleep analyzer", "bed", "presence", "bed sensor", "sleep tracking"],
-    "no": ["withings", "søvn", "sleep analyzer", "seng", "tilstedeværelse", "sengesensor", "søvnmåling"]
+    "en": [
+      "withings",
+      "sleep",
+      "sleep analyzer",
+      "bed",
+      "presence",
+      "bed sensor",
+      "sleep tracking"
+    ],
+    "no": [
+      "withings",
+      "søvn",
+      "sleep analyzer",
+      "seng",
+      "tilstedeværelse",
+      "sengesensor",
+      "søvnmåling"
+    ]
   },
   "permissions": [],
   "api": {
@@ -240,8 +260,12 @@
         "no": "Sleep Analyzer"
       },
       "class": "sensor",
-      "platforms": ["local"],
-      "connectivity": ["cloud"],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
       "capabilities": [
         "withings_in_bed",
         "withings_bedtime",
@@ -352,6 +376,29 @@
             "en": "h",
             "no": "t"
           }
+        },
+        {
+          "id": "maintenance",
+          "type": "group",
+          "label": {
+            "en": "Maintenance",
+            "no": "Vedlikehold"
+          },
+          "children": [
+            {
+              "id": "renew_now",
+              "type": "checkbox",
+              "value": false,
+              "label": {
+                "en": "Renew subscription on save",
+                "no": "Forny abonnement ved lagring"
+              },
+              "hint": {
+                "en": "Verifies the bed-in and bed-out subscriptions at Withings and recreates any that are missing, then clears itself. Use this when Notifications shows Lost and you do not want to wait for the scheduled check.",
+                "no": "Verifiserer abonnementene for seng inn og seng ut hos Withings og gjenoppretter dem som mangler, og nullstiller seg selv. Bruk denne når Varsling viser Mistet og du ikke vil vente på den planlagte sjekken."
+              }
+            }
+          ]
         }
       ],
       "images": {
