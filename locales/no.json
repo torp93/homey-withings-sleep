@@ -36,7 +36,6 @@
     "show_identity": "Vis Homey-ID og abonnements-URL",
     "identity_no_webhook": "(Webhook-ID er ikke fylt inn ennå — plassholderen over erstattes når du lagrer den.)",
     "copy_url": "Kopier URL",
-    "copy_result": "Kopier resultatet",
     "copied": "Kopiert",
     "copy_failed": "Kunne ikke kopiere — merk teksten manuelt"
   }

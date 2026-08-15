@@ -36,7 +36,6 @@
     "show_identity": "Show Homey id and subscription URL",
     "identity_no_webhook": "(No webhook id saved yet — the placeholder above is filled in once you save one.)",
     "copy_url": "Copy URL",
-    "copy_result": "Copy result",
     "copied": "Copied",
     "copy_failed": "Could not copy — select the text manually"
   }

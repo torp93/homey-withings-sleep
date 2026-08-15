@@ -71,7 +71,7 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
 <p id="status"></p>
 <pre id="result" class="copyable"></pre>
 <p>
-  <button id="copyResult" class="homey-button-secondary-full" data-i18n="settings.copy_result" hidden></button>
+  <button id="copyResult" class="homey-button-secondary-full" data-i18n="settings.copy_url" hidden></button>
 </p>
 
 <style>
@@ -235,9 +235,11 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
           res.webhookUrl || '—'
         ].join('\n');
 
+        // Only the URL is ever pasted elsewhere; the rest of the result is
+        // diagnostics meant to be read, not carried around.
         const copy = document.getElementById('copyResult');
-        copy.hidden = false;
-        copy.onclick = () => copyText(result.textContent, copy);
+        copy.hidden = !res.webhookUrl;
+        copy.onclick = () => copyText(res.webhookUrl, copy);
       });
     });
 
