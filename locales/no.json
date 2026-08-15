@@ -41,6 +41,7 @@
     "source": "Kilde",
     "no_webhook_url": "Ingen abonnements-URL ennå. Fyll inn Webhook-ID og lagre, så vises den her.",
     "guide_step2_full": "Hver installasjon abonnerer med sin egen Homey-ID lagt til. Basis-URL-en over dekker dem alle, så denne trenger du normalt ikke registrere:",
-    "no_source": "ingen kilde, client secret mangler"
+    "no_source": "ingen kilde, client secret mangler",
+    "env_probe": "Miljøsjekk, hvilke nøkler hver kilde faktisk leverer:"
   }
 }

@@ -222,8 +222,12 @@
         }
 
         const source = res.source.settings ? 'app settings'
-          : res.source.env ? 'env.json (Homey.env)'
+          : res.source.env ? `env.json (${res.source.env})`
             : Homey.__('settings.no_source');
+
+        const probe = Object.entries(res.envProbe || {})
+          .map(([name, keys]) => `  ${name}: ${keys.length ? keys.join(', ') : 'tom'}`)
+          .join('\n');
 
         const lines = [
           `${res.withings.ok ? '✓' : '✗'} Withings: ${res.withings.message}`,
@@ -231,7 +235,10 @@
           '',
           `${Homey.__('settings.client_id')}: ${res.clientId || '?'}`,
           `${Homey.__('settings.source')}: ${source}`,
-          `Homey ID: ${res.homeyId || '?'}`
+          `Homey ID: ${res.homeyId || '?'}`,
+          '',
+          Homey.__('settings.env_probe'),
+          probe
         ];
 
         // Without a webhook id there is no URL to register, so the hint would

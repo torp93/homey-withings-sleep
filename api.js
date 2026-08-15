@@ -49,8 +49,18 @@ module.exports = {
     const result = {
       source: {
         settings: Boolean(homey.settings.get('WITHINGS_CLIENT_SECRET')),
-        env: Boolean((homey.env || {}).WITHINGS_CLIENT_SECRET)
+        // Which env accessor carried it, or null. Names only, never values.
+        env: app.envSource('WITHINGS_CLIENT_SECRET')
       },
+      // Same probe across all four keys, so a partially delivered environment
+      // is visible rather than looking like a total failure.
+      envProbe: Object.fromEntries(
+        Object.entries(app.envSources).map(([name, env]) => [
+          name,
+          ['WITHINGS_CLIENT_ID', 'WITHINGS_CLIENT_SECRET', 'WEBHOOK_ID', 'WEBHOOK_SECRET']
+            .filter(k => env && env[k])
+        ])
+      ),
       clientId: describe(clientId),
       homeyId: null,
       // The exact string this Homey subscribes with. Shown so nobody has to go

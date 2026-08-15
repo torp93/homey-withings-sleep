@@ -14,6 +14,12 @@ class WithingsSleepApp extends Homey.App {
   async onInit() {
     this.registerFlowCards();
 
+    // Names only: which accessor carries each key, never the value itself.
+    const seen = Object.entries(this.envSources)
+      .map(([name, env]) => `${name}=[${CONFIG_KEYS.filter(k => env && env[k]).join(' ') || 'tom'}]`)
+      .join(' ');
+    this.log(`Environment probe: ${seen}`);
+
     const missing = CONFIG_KEYS.filter(key => !this._config(key));
     if (missing.length) {
       this.error(`Missing configuration: ${missing.join(', ')}: set these in the app settings.`);
@@ -23,12 +29,35 @@ class WithingsSleepApp extends Homey.App {
   }
 
   /**
-   * An explicit app-settings override, then Homey.env.
+   * Every place the environment from env.json could plausibly surface.
    *
-   * Homey.env comes from env.json, which the CLI reads and delivers to the
-   * running app separately from the app archive — the archive never carries
-   * it. Nothing is compiled into the source tree, so no secret ships inside a
-   * published build.
+   * The CLI logs these values as "Homey.env" and uploads them with the build,
+   * but on Homey Pro 13.4.0 `this.homey.env` reads empty in both a devkit
+   * install and a store install. Rather than guess which accessor is the
+   * documented one, read all of them: the app works whichever is populated,
+   * and envSource() reports the winner so the ambiguity is observable instead
+   * of theoretical.
+   */
+  get envSources() {
+    return {
+      'this.homey.env': this.homey.env || {},
+      'Homey.env': Homey.env || {},
+      'process.env': process.env || {}
+    };
+  }
+
+  /** Which env accessor, if any, carries a given key. */
+  envSource(key) {
+    const found = Object.entries(this.envSources).find(([, env]) => env && env[key]);
+    return found ? found[0] : null;
+  }
+
+  /**
+   * An explicit app-settings override, then the environment.
+   *
+   * The environment comes from env.json, which the CLI delivers separately
+   * from the app archive; the archive never carries it. Nothing is compiled
+   * into the source tree, so no secret ships inside a published build.
    *
    * Settings win so a value can be corrected from the app's settings page
    * without editing source or reinstalling.
@@ -37,7 +66,11 @@ class WithingsSleepApp extends Homey.App {
     const fromSettings = this.homey.settings.get(key);
     if (fromSettings) return fromSettings;
 
-    return (this.homey.env || {})[key];
+    for (const env of Object.values(this.envSources)) {
+      if (env && env[key]) return env[key];
+    }
+
+    return undefined;
   }
 
   get clientId() {

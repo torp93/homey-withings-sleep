@@ -1,4 +1,8 @@
 {
+  "1.0.4": {
+    "en": "Diagnostics: the connection test now reports which environment source delivers each credential.",
+    "no": "Diagnostikk: tilkoblingstesten viser nå hvilken miljøkilde som leverer hver enkelt nøkkel."
+  },
   "1.0.3": {
     "en": "Adds a setup guide and a connection test to the app settings, including a button that shows this Homey's id and subscription URL with a copy button. Credentials now come from the app owner's environment only, never from a file inside the app package.",
     "no": "Legger til oppsettsveiledning og tilkoblingstest i appinnstillingene, med en knapp som viser denne Homeyens ID og abonnements-URL, klar til kopiering. Legitimasjon hentes nå kun fra appeierens miljø, aldri fra en fil inne i apppakken."
