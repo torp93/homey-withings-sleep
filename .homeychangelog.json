@@ -1,7 +1,7 @@
 {
-  "1.1.3": {
-    "en": "Each installation uses its own Withings application again. Withings only lets an application authorize accounts it has been approved for, so a shared one cannot be shipped. The app settings guide you through it and end with a connection test.",
-    "no": "Hver installasjon bruker igjen sin egen Withings-applikasjon. Withings lar en applikasjon bare autorisere kontoer den er godkjent for, så en felles kan ikke følge med. Appinnstillingene tar deg gjennom det og avslutter med en tilkoblingstest."
+  "1.1.4": {
+    "en": "Signing in is enough again: the app brings its own Withings credentials, and entering your own in the app settings stays optional.",
+    "no": "Det holder å logge inn igjen: appen har med sin egen Withings-legitimasjon, og å legge inn din egen i appinnstillingene er fortsatt valgfritt."
   },
   "1.1.2": {
     "en": "Signing in is enough again: the app brings its own Withings credentials, and entering your own is optional. The device icon is back to the bed.",
