@@ -26,16 +26,16 @@ visible instead of silent.
 
 ## Setup
 
-**This section is for running the app from source, or for using your own
-Withings application instead of the built-in one.** People who install from the
-Homey App Store add the device and sign in; the app owner's credentials reach
-the app through `Homey.env`, uploaded with the build and never packed into the
-archive.
+**Everyone does this, not just developers.** Each installation uses its own
+Withings application and its own Homey webhook, entered on the app's settings
+page, which carries the same guide as below plus a connection test.
 
-Note that `Homey.env` does reach a published build, but reads empty on Homey
-Pro 13.4.0 in a devkit install (`homey app run --remote` and `homey app
-install`). For local development, enter the same values on the app's settings
-page, which override the environment.
+The reason is Withings, not Homey: an application can only authorize accounts
+it has been approved for. A Public API integration starts in Development, where
+that means the developer's own account, so a shared client ID and secret
+shipped with the app would fail at the login screen for everyone else.
+Published builds therefore carry an empty environment, which also keeps the
+author's secrets out of the build entirely.
 
 Do the steps in this order, since the Withings application needs the webhook
 ID: registering the webhook first saves a round trip.
