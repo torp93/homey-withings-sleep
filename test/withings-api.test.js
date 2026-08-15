@@ -115,9 +115,12 @@ test('expiresAt is set a minute before the real deadline', async () => {
 
   const before = Date.now();
   const tokens = await api.exchangeCode('code');
+  const after = Date.now();
 
-  assert.ok(tokens.expiresAt <= before + 3540 * 1000);
-  assert.ok(tokens.expiresAt > before + 3500 * 1000);
+  // expiresAt is computed from a clock reading taken somewhere inside the
+  // call, so it can only be bounded by the readings either side of it.
+  assert.ok(tokens.expiresAt >= before + 3540 * 1000);
+  assert.ok(tokens.expiresAt <= after + 3540 * 1000);
 });
 
 test('a non-zero status becomes a WithingsError', async () => {
