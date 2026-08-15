@@ -19,11 +19,12 @@
   <p><a class="ext" href="https://developer.withings.com/dashboard/create">developer.withings.com/dashboard/create</a></p>
   <p data-i18n="settings.guide_step2_body"></p>
   <p data-i18n="settings.guide_step2_urls"></p>
-  <pre>https://callback.athom.com/oauth2/callback/
-https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
+  <pre>https://callback.athom.com/oauth2/callback/</pre>
   <p data-i18n="settings.guide_step2_slash"></p>
 
   <p data-i18n="settings.guide_step2_base"></p>
+  <pre>https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
+  <p data-i18n="settings.guide_step2_full"></p>
   <pre>https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;/?homey=&lt;HOMEY_ID&gt;</pre>
 
   <p>
@@ -75,8 +76,9 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
 </p>
 
 <style>
-  /* Long URLs must wrap and stay selectable rather than run off the screen. */
-  pre.copyable {
+  /* Long URLs must wrap and stay selectable rather than run off the screen.
+     Applies to the guide's examples too, which are wider than a phone. */
+  pre {
     white-space: pre-wrap;
     word-break: break-all;
     user-select: text;
