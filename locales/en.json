@@ -9,11 +9,11 @@
     "credentials": "Credentials",
     "intro": "Optional. Leave blank to use the app's built-in credentials. Fill these in only if you want to use your own Withings application, from the Withings Partner Hub (Public API integration) and tools.developer.homey.app/webhooks.",
     "withings": "Withings application",
-    "client_id": "Client ID",
-    "client_secret": "Client secret",
+    "client_id": "Withings Client ID",
+    "client_secret": "Withings Client secret",
     "webhook": "Homey webhook",
-    "webhook_id": "Webhook ID",
-    "webhook_secret": "Webhook secret",
+    "webhook_id": "Homey Webhook ID",
+    "webhook_secret": "Homey Webhook secret",
     "save": "Save",
     "saved": "Saved. Restart the app or re-add the device to apply.",
     "test": "Test connection",
@@ -37,6 +37,8 @@
     "identity_no_webhook": "(No webhook id saved yet — the placeholder above is filled in once you save one.)",
     "copy_url": "Copy URL",
     "copied": "Copied",
-    "copy_failed": "Could not copy — select the text manually"
+    "copy_failed": "Could not copy — select the text manually",
+    "source": "Source",
+    "no_webhook_url": "No subscription URL yet — fill in the Webhook ID and save, and it appears here."
   }
 }

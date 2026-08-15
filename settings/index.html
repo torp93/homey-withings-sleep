@@ -223,17 +223,24 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
           : res.source.env ? 'env.json (Homey.env)'
             : 'ingen kilde — client secret mangler';
 
-        result.textContent = [
+        const lines = [
           `${res.withings.ok ? '✓' : '✗'} Withings — ${res.withings.message}`,
           `${res.webhook.ok ? '✓' : '✗'} Webhook — ${res.webhook.message}`,
           '',
-          `Client ID: ${res.clientId || '—'}`,
-          `Kilde: ${source}`,
-          `Homey ID: ${res.homeyId || '—'}`,
-          '',
-          Homey.__('settings.webhook_url_hint'),
-          res.webhookUrl || '—'
-        ].join('\n');
+          `${Homey.__('settings.client_id')}: ${res.clientId || '—'}`,
+          `${Homey.__('settings.source')}: ${source}`,
+          `Homey ID: ${res.homeyId || '—'}`
+        ];
+
+        // Without a webhook id there is no URL to register, so the hint would
+        // dangle over an em dash. Say what to do instead.
+        if (res.webhookUrl) {
+          lines.push('', Homey.__('settings.webhook_url_hint'), res.webhookUrl);
+        } else {
+          lines.push('', Homey.__('settings.no_webhook_url'));
+        }
+
+        result.textContent = lines.join('\n');
 
         // Only the URL is ever pasted elsewhere; the rest of the result is
         // diagnostics meant to be read, not carried around.

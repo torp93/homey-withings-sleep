@@ -9,11 +9,11 @@
     "credentials": "Legitimasjon",
     "intro": "Valgfritt. La feltene stå tomme for å bruke appens innebygde legitimasjon. Fyll dem bare ut hvis du vil bruke din egen Withings-applikasjon, fra Withings Partner Hub (Public API integration) og tools.developer.homey.app/webhooks.",
     "withings": "Withings-applikasjon",
-    "client_id": "Client ID",
-    "client_secret": "Client secret",
+    "client_id": "Withings Client ID",
+    "client_secret": "Withings Client secret",
     "webhook": "Homey-webhook",
-    "webhook_id": "Webhook-ID",
-    "webhook_secret": "Webhook-secret",
+    "webhook_id": "Homey Webhook-ID",
+    "webhook_secret": "Homey Webhook-secret",
     "save": "Lagre",
     "saved": "Lagret. Start appen på nytt eller legg til enheten igjen for å ta i bruk.",
     "test": "Test tilkoblingen",
@@ -37,6 +37,8 @@
     "identity_no_webhook": "(Webhook-ID er ikke fylt inn ennå — plassholderen over erstattes når du lagrer den.)",
     "copy_url": "Kopier URL",
     "copied": "Kopiert",
-    "copy_failed": "Kunne ikke kopiere — merk teksten manuelt"
+    "copy_failed": "Kunne ikke kopiere — merk teksten manuelt",
+    "source": "Kilde",
+    "no_webhook_url": "Ingen abonnements-URL ennå — fyll inn Webhook-ID og lagre, så vises den her."
   }
 }
