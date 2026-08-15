@@ -130,8 +130,8 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;/?homey=&lt;HOMEY-ID&gt;</p
         }
 
         const source = res.source.settings ? 'app settings'
-          : res.source.env ? 'env.json'
-            : 'lib/credentials.js';
+          : res.source.env ? 'env.json (Homey.env)'
+            : 'ingen kilde — client secret mangler';
 
         result.textContent = [
           `${res.withings.ok ? '✓' : '✗'} Withings — ${res.withings.message}`,

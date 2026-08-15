@@ -27,9 +27,9 @@ visible instead of silent.
 ## Setup
 
 **This section is for running the app from source.** People who install the app
-from the Homey App Store do none of it: the credentials below are compiled into
-`lib/credentials.js`, which is packed into the app archive, so a user only signs
-in with their own Withings account when pairing.
+from the Homey App Store do none of it: they add the device and sign in with
+their own Withings account when pairing. The app owner's credentials reach the
+app through `Homey.env`, so nothing is asked of the user.
 
 Three things must exist before a source checkout can pair. Two of them require
 accounts only you can create.
@@ -77,13 +77,23 @@ triggering.
 }
 ```
 
-`env.json` is gitignored. `env.json.example` is the template.
+`env.json` is the only place the app owner's credentials live, for both
+development and publishing. It is gitignored; `env.json.example` is the
+template.
 
-On Homey Pro firmware 13.4.0, `env.json` does not reach the app when started
-with `homey app run --remote` — `this.homey.env` arrives empty. `app.js` falls
-back to `lib/credentials.js`, a plain module holding the same four keys, which
-is also gitignored and is what ships in a published build. Copy
-`env.json.example`'s keys into it if `env.json` turns out to be ignored.
+**The CLI keeps these values out of the app archive.** `homey app run`,
+`install` and `publish` each read `env.json` separately and deliver its
+contents to the running app as `Homey.env` — inside an `App` subclass that is
+`this.homey.env`. The archive itself never contains the file, so no secret
+ships in a published build. `.homeyignore` states the exclusion explicitly
+rather than relying on the CLI's defaults.
+
+`app.js` resolves each key as an app-settings override first, then `Homey.env`.
+There is no third source and no credentials compiled into the source tree.
+
+If a key turns up empty at runtime, use the **Test connection** button on the
+app's settings page: it reports which of the two sources supplied the value,
+without revealing it.
 
 ## How it works
 

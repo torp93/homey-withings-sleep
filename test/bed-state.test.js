@@ -17,9 +17,9 @@ test('parseNotification reads a bed-in event', () => {
   });
 });
 
-test('parseNotification reads a real bed event payload', () => {
-  // Captured from an actual Withings notification: it uses `date`, not
-  // startdate/enddate, and includes the mat's deviceid.
+test('parseNotification reads a full bed event payload', () => {
+  // Representative synthetic Withings notification: this shape uses `date`,
+  // not startdate/enddate, and includes the mat's deviceid.
   const event = parseNotification({
     date: '1700003600',
     deviceid: 'aaaabbbbccccddddeeeeffff0000111122223333',

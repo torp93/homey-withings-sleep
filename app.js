@@ -2,7 +2,6 @@
 
 const Homey = require('homey');
 const { version } = require('./app.json');
-const credentials = require('./lib/credentials');
 
 const CONFIG_KEYS = [
   'WITHINGS_CLIENT_ID',
@@ -24,12 +23,12 @@ class WithingsSleepApp extends Homey.App {
   }
 
   /**
-   * Settings, then env.json, then the values compiled into lib/credentials.js.
+   * An explicit app-settings override, then Homey.env.
    *
-   * env.json is the documented mechanism but does not reach the app on Homey
-   * Pro firmware 13.4.0 via `homey app run --remote`: the CLI reads the file
-   * and passes it to runApp(), yet `this.homey.env` arrives empty. It stays in
-   * the chain so the app keeps working if that is ever fixed.
+   * Homey.env comes from env.json, which the CLI reads and delivers to the
+   * running app separately from the app archive — the archive never carries
+   * it. Nothing is compiled into the source tree, so no secret ships inside a
+   * published build.
    *
    * Settings win so a value can be corrected from the app's settings page
    * without editing source or reinstalling.
@@ -38,10 +37,7 @@ class WithingsSleepApp extends Homey.App {
     const fromSettings = this.homey.settings.get(key);
     if (fromSettings) return fromSettings;
 
-    const fromEnv = (this.homey.env || {})[key];
-    if (fromEnv) return fromEnv;
-
-    return credentials[key];
+    return (this.homey.env || {})[key];
   }
 
   get clientId() {

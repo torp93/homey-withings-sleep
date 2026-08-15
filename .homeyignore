@@ -1,0 +1,13 @@
+# Never pack developer credentials into the app archive.
+#
+# The CLI already excludes env.json and dotfiles by default; these rules are
+# explicit so the exclusion survives a change in CLI defaults, and so
+# lib/credentials.js — a plain module the packer would otherwise include — can
+# never ship. Nothing at runtime reads it.
+env.json
+lib/credentials.js
+
+# Development-only material, no reason to ship it to users.
+test/
+tools/
+docs/

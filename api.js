@@ -15,8 +15,8 @@ module.exports = {
    * Values typed into the settings page win over everything else, so the page
    * sends them along unsaved: you can test a correction before committing it.
    * Anything left blank falls through to the app's normal resolution order
-   * (settings, then env.json, then lib/credentials.js), which is also what
-   * tells us which of those sources is live.
+   * (an app-settings override, then Homey.env), which is also what tells us
+   * which of the two sources is live.
    */
   async testCredentials({ homey, body = {} }) {
     const app = homey.app;
@@ -29,9 +29,7 @@ module.exports = {
     const result = {
       source: {
         settings: Boolean(homey.settings.get('WITHINGS_CLIENT_SECRET')),
-        env: Boolean((homey.env || {}).WITHINGS_CLIENT_SECRET),
-        builtIn: !homey.settings.get('WITHINGS_CLIENT_SECRET')
-          && !(homey.env || {}).WITHINGS_CLIENT_SECRET
+        env: Boolean((homey.env || {}).WITHINGS_CLIENT_SECRET)
       },
       clientId: describe(clientId),
       withings: { ok: false, message: '' },
