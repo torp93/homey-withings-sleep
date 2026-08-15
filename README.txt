@@ -22,10 +22,8 @@ FLOW CARDS
 
 SETUP
 
-You need a Withings account with a Sleep Analyzer, and a free developer application registered at the Withings Partner Hub to get a client ID and secret. Enter these in the app's settings.
+You need a Withings account with a Sleep Analyzer set up in the Withings app. Add the device in Homey and sign in to Withings when asked. That is all.
 
-Realtime events also need a Homey webhook, registered at tools.developer.homey.app. Without one the app falls back to polling and keeps working, but loses instant triggering.
-
-Full setup instructions: https://github.com/torp93/homey-withings-sleep
+Source code and technical notes: https://github.com/torp93/homey-withings-sleep
 
 This app is not made by or affiliated with Withings.

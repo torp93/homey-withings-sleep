@@ -26,8 +26,13 @@ visible instead of silent.
 
 ## Setup
 
-Three things must exist before the app can pair. Two of them require accounts
-only you can create.
+**This section is for running the app from source.** People who install the app
+from the Homey App Store do none of it: the credentials below are compiled into
+`lib/credentials.js`, which is packed into the app archive, so a user only signs
+in with their own Withings account when pairing.
+
+Three things must exist before a source checkout can pair. Two of them require
+accounts only you can create.
 
 ### 1. Register a Withings application
 
@@ -70,6 +75,12 @@ triggering.
 ```
 
 `env.json` is gitignored. `env.json.example` is the template.
+
+On Homey Pro firmware 13.4.0, `env.json` does not reach the app when started
+with `homey app run --remote` — `this.homey.env` arrives empty. `app.js` falls
+back to `lib/credentials.js`, a plain module holding the same four keys, which
+is also gitignored and is what ships in a published build. Copy
+`env.json.example`'s keys into it if `env.json` turns out to be ignored.
 
 ## How it works
 

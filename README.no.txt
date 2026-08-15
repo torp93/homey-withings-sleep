@@ -22,10 +22,8 @@ FLYTKORT
 
 OPPSETT
 
-Du trenger en Withings-konto med en Sleep Analyzer, og en gratis utviklerapplikasjon registrert hos Withings Partner Hub for å få klient-ID og hemmelighet. Disse legges inn i appens innstillinger.
+Du trenger en Withings-konto med en Sleep Analyzer satt opp i Withings-appen. Legg til enheten i Homey og logg inn hos Withings når du blir bedt om det. Det er alt.
 
-Sanntidshendelser krever i tillegg en Homey-webhook, registrert på tools.developer.homey.app. Uten den faller appen tilbake til polling og fungerer fortsatt, men mister umiddelbar utløsing.
-
-Fullstendig oppsettsveiledning: https://github.com/torp93/homey-withings-sleep
+Kildekode og tekniske notater: https://github.com/torp93/homey-withings-sleep
 
 Denne appen er ikke laget av eller tilknyttet Withings.
