@@ -10,6 +10,26 @@ function describe(value) {
 
 module.exports = {
   /**
+   * This Homey's id and the exact URL it subscribes with.
+   *
+   * Separate from testCredentials so it answers instantly and works before
+   * anything is configured: finding your Homey id should not require a round
+   * trip to Withings, or credentials that are not filled in yet.
+   */
+  async getIdentity({ homey }) {
+    const homeyId = await homey.cloud.getHomeyId();
+    const webhookId = homey.app.webhookId;
+
+    return {
+      homeyId,
+      // Falls back to a placeholder so the shape is still readable before the
+      // webhook id is known. Must match device.js, slash and all.
+      webhookUrl: `https://webhooks.athom.com/webhook/${webhookId || '<WEBHOOK_ID>'}/?homey=${homeyId}`,
+      webhookKnown: Boolean(webhookId)
+    };
+  },
+
+  /**
    * Check the credentials the app would actually use right now.
    *
    * Values typed into the settings page win over everything else, so the page

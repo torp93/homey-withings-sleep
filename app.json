@@ -20,6 +20,10 @@
   },
   "permissions": [],
   "api": {
+    "getIdentity": {
+      "method": "GET",
+      "path": "/identity"
+    },
     "testCredentials": {
       "method": "POST",
       "path": "/testCredentials"

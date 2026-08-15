@@ -20,9 +20,20 @@
   <p data-i18n="settings.guide_step2_body"></p>
   <p data-i18n="settings.guide_step2_urls"></p>
   <pre>https://callback.athom.com/oauth2/callback/
-https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
+https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;</pre>
   <p data-i18n="settings.guide_step2_slash"></p>
+
   <p data-i18n="settings.guide_step2_base"></p>
+  <pre>https://webhooks.athom.com/webhook/&lt;WEBHOOK_ID&gt;/?homey=&lt;HOMEY_ID&gt;</pre>
+
+  <p>
+    <button id="identity" class="homey-button-secondary-full" data-i18n="settings.show_identity"></button>
+  </p>
+  <pre id="identityResult" class="copyable"></pre>
+  <p>
+    <button id="copyUrl" class="homey-button-secondary-full" data-i18n="settings.copy_url" hidden></button>
+  </p>
+
   <p data-i18n="settings.guide_step2_scopes"></p>
 
   <h4 data-i18n="settings.guide_step3"></h4>
@@ -58,7 +69,20 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
 </p>
 
 <p id="status"></p>
-<pre id="result"></pre>
+<pre id="result" class="copyable"></pre>
+<p>
+  <button id="copyResult" class="homey-button-secondary-full" data-i18n="settings.copy_result" hidden></button>
+</p>
+
+<style>
+  /* Long URLs must wrap and stay selectable rather than run off the screen. */
+  pre.copyable {
+    white-space: pre-wrap;
+    word-break: break-all;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+</style>
 
 <script type="application/javascript">
   const FIELDS = {
@@ -70,6 +94,45 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
 
   function onHomeyReady(Homey) {
     const status = document.getElementById('status');
+
+    /**
+     * Clipboard access is often unavailable in the phone app's webview, so fall
+     * back to a hidden textarea and execCommand. If both fail the text is still
+     * selectable on screen, which is why nothing here throws.
+     */
+    function copyText(text, button) {
+      const done = ok => {
+        const label = Homey.__(ok ? 'settings.copied' : 'settings.copy_failed');
+        const previous = button.textContent;
+        button.textContent = label;
+        setTimeout(() => { button.textContent = previous; }, 2000);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => done(true), () => fallback());
+        return;
+      }
+
+      fallback();
+
+      function fallback() {
+        try {
+          const area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          area.setSelectionRange(0, text.length);
+          const ok = document.execCommand('copy');
+          document.body.removeChild(area);
+          done(ok);
+        } catch {
+          done(false);
+        }
+      }
+    }
 
     // A plain target="_blank" is a dead end inside the phone app's webview.
     // Homey.openURL hands the link to the real browser where it exists; on
@@ -112,6 +175,29 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
       });
     });
 
+    document.getElementById('identity').addEventListener('click', () => {
+      const out = document.getElementById('identityResult');
+      out.textContent = Homey.__('settings.testing');
+
+      Homey.api('GET', '/identity', null, (err, res) => {
+        if (err) {
+          out.textContent = `${Homey.__('settings.test_failed')}: ${err.message || err}`;
+          return;
+        }
+
+        out.textContent = [
+          `Homey ID: ${res.homeyId}`,
+          '',
+          res.webhookUrl,
+          res.webhookKnown ? '' : Homey.__('settings.identity_no_webhook')
+        ].filter(Boolean).join('\n');
+
+        const copy = document.getElementById('copyUrl');
+        copy.hidden = false;
+        copy.onclick = () => copyText(res.webhookUrl, copy);
+      });
+    });
+
     document.getElementById('test').addEventListener('click', () => {
       const result = document.getElementById('result');
 
@@ -148,6 +234,10 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
           Homey.__('settings.webhook_url_hint'),
           res.webhookUrl || '—'
         ].join('\n');
+
+        const copy = document.getElementById('copyResult');
+        copy.hidden = false;
+        copy.onclick = () => copyText(result.textContent, copy);
       });
     });
 

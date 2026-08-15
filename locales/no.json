@@ -29,9 +29,15 @@
     "guide_step2_body": "Velg «Public API integration» som type — de andre krever avtale. Kall den hva du vil. Client ID og Secret finner du på oversiktssiden etterpå, og hemmeligheten vises bare én gang; bruk «Renew» hvis du mister den.",
     "guide_step2_urls": "Registrer begge disse som Registered URLs:",
     "guide_step2_slash": "Skråstreken på slutten av callback-URL-en må være med. Den sammenlignes tegn for tegn, og uten den feiler innloggingen med en feilmelding som ikke sier hva som er galt.",
-    "guide_step2_base": "Webhook-URL-en registreres uten spørring. Hver Homey abonnerer med sin egen ID lagt til, og basis-URL-en dekker alle. Trenger du den fulle formen, står den ferdig under testresultatet.",
+    "guide_step2_base": "Webhook-URL-en registreres uten spørring. Hver installasjon abonnerer med sin egen Homey-ID lagt til, og basis-URL-en dekker dem alle:",
     "guide_step2_scopes": "Appen ber om user.info, user.metrics, user.activity og user.sleepevents. Uten user.sleepevents opprettes abonnementene, men ingen sengehendelser leveres noen gang.",
     "guide_step3": "3. Lim inn og test",
-    "guide_step3_body": "Fyll inn de fire feltene over, trykk Lagre, og deretter Test tilkoblingen. Testen spør Withings om en nonce — samme signerte kall appen bruker ved tokenfornyelse — og sjekker at webhooken svarer. Den viser også hvilken kilde verdiene kom fra."
+    "guide_step3_body": "Fyll inn de fire feltene over, trykk Lagre, og deretter Test tilkoblingen. Testen spør Withings om en nonce — samme signerte kall appen bruker ved tokenfornyelse — og sjekker at webhooken svarer. Den viser også hvilken kilde verdiene kom fra.",
+    "show_identity": "Vis Homey-ID og abonnements-URL",
+    "identity_no_webhook": "(Webhook-ID er ikke fylt inn ennå — plassholderen over erstattes når du lagrer den.)",
+    "copy_url": "Kopier URL",
+    "copy_result": "Kopier resultatet",
+    "copied": "Kopiert",
+    "copy_failed": "Kunne ikke kopiere — merk teksten manuelt"
   }
 }
