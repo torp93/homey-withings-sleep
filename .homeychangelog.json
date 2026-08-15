@@ -1,4 +1,8 @@
 {
+  "1.0.2": {
+    "en": "The app and device now show a photo of the Sleep Analyzer instead of a plain placeholder.",
+    "no": "Appen og enheten viser nå et bilde av Sleep Analyzer i stedet for en ensfarget plassholder."
+  },
   "1.0.1": {
     "en": "First public release. Bed presence from the Withings Sleep Analyzer, with bedtime, wake-up time and time in and out of bed. The bed-in and bed-out notification subscriptions are verified on a timer and recreated when they lapse, and a flow trigger tells you if that ever happens.",
     "no": "Første offentlige utgivelse. Sengetilstedeværelse fra Withings Sleep Analyzer, med leggetid, tidspunkt du stod opp, og tid i og ute av sengen. Varslingsabonnementene for seng inn og seng ut verifiseres jevnlig og gjenopprettes hvis de faller bort, og et flytkort varsler deg hvis det skjer."
