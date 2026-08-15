@@ -1,4 +1,8 @@
 {
+  "1.1.2": {
+    "en": "Signing in is enough again: the app brings its own Withings credentials, and entering your own is optional. The device icon is back to the bed.",
+    "no": "Det holder å logge inn igjen: appen har med sin egen Withings-legitimasjon, og å legge inn din egen er valgfritt. Enhetsikonet er tilbake til sengen."
+  },
   "1.1.1": {
     "en": "The app icon is now the Withings wordmark, and the device has its own icon showing the mat instead of reusing the app icon.",
     "no": "Appikonet er nå Withings-ordmerket, og enheten har fått sitt eget ikon som viser matten i stedet for å gjenbruke appikonet."

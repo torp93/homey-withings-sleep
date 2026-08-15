@@ -7,7 +7,7 @@
   },
   "settings": {
     "credentials": "Legitimasjon",
-    "intro": "Appen trenger din egen Withings-applikasjon. Fyll inn feltene under, veiledningen viser hvordan du skaffer verdiene.",
+    "intro": "Valgfritt. La feltene stå tomme for å bruke appens innebygde legitimasjon. Fyll dem bare ut hvis du vil bruke din egen Withings-applikasjon.",
     "withings": "Withings-applikasjon",
     "client_id": "Withings Client ID",
     "client_secret": "Withings Client secret",

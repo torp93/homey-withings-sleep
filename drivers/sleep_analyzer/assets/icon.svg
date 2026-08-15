@@ -1,15 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
-  <title>Sleep Analyzer</title>
-  <!--
-    The mat itself, not a bed: this is the driver icon and has to read as the
-    device. A wide rounded pad with two quilted seams and the cable leaving one
-    end. Stroke weight matches the capability icons so the set looks related,
-    and everything stays well inside the canvas so nothing clips at small
-    sizes.
-  -->
   <g fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="95" y="175" width="360" height="150" rx="40"/>
-    <path d="M255 195v110M345 195v110"/>
-    <path d="M95 250H60a35 35 0 0 0-35 35v40"/>
+    <path d="M75 240v115M75 355h350M110 355v65M390 355v65M120 310h70"/>
+    <path d="M270 125h75l-75 80h75M375 55h55L375 115h55"/>
   </g>
 </svg>

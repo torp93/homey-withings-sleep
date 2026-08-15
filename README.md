@@ -26,15 +26,16 @@ visible instead of silent.
 
 ## Setup
 
-**Everyone does this, not just developers.** Each installation uses its own
-Withings application and its own Homey webhook, entered on the app's settings
-page. Published builds ship with an empty environment on purpose, so none of
-the author's credentials are distributed or stored at Athom.
+**This section is for running the app from source, or for using your own
+Withings application instead of the built-in one.** People who install from the
+Homey App Store add the device and sign in; the app owner's credentials reach
+the app through `Homey.env`, uploaded with the build and never packed into the
+archive.
 
-`Homey.env` would be the mechanism for shipping shared credentials, but on
-Homey Pro 13.4.0 it reads empty in a devkit install and a store install alike.
-`app.js` still reads it, along with the other places it could surface, so the
-app picks the values up if that is ever fixed.
+Note that `Homey.env` does reach a published build, but reads empty on Homey
+Pro 13.4.0 in a devkit install (`homey app run --remote` and `homey app
+install`). For local development, enter the same values on the app's settings
+page, which override the environment.
 
 Do the steps in this order, since the Withings application needs the webhook
 ID: registering the webhook first saves a round trip.

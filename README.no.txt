@@ -22,11 +22,9 @@ FLYTKORT
 
 OPPSETT
 
-Denne appen krever mer av deg enn de fleste. Les dette før du installerer.
+Du trenger en Withings-konto med en Sleep Analyzer satt opp i Withings-appen. Legg til enheten i Homey og logg inn hos Withings når du blir bedt om det. Det er alt.
 
-Du trenger en Withings-konto med en Sleep Analyzer, og du må registrere din egen gratis applikasjon hos Withings Partner Hub for å få klient-ID og hemmelighet. Sanntidshendelser krever i tillegg en webhook opprettet i Homeys utviklerverktøy. Begge deler legges inn i appens innstillinger, og innstillingssiden tar deg gjennom det steg for steg, med en tilkoblingstest til slutt.
-
-Withings tillater ikke at en app som denne leverer med felles legitimasjon, så det finnes ingen vei utenom. Sett av et kvarter første gang. Når det er satt opp, trenger du ikke røre det igjen.
+Vil du heller bruke din egen Withings-applikasjon i stedet for den innebygde, kan du legge inn egne nøkler i appinnstillingene, med veiledning og en tilkoblingstest.
 
 Kildekode og tekniske notater: https://github.com/torp93/homey-withings-sleep
 
