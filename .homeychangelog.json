@@ -1,4 +1,8 @@
 {
+  "1.0.3": {
+    "en": "Adds a setup guide and a connection test to the app settings, including a button that shows this Homey's id and subscription URL with a copy button. Credentials now come from the app owner's environment only, never from a file inside the app package.",
+    "no": "Legger til oppsettsveiledning og tilkoblingstest i appinnstillingene, med en knapp som viser denne Homeyens ID og abonnements-URL, klar til kopiering. Legitimasjon hentes nå kun fra appeierens miljø, aldri fra en fil inne i apppakken."
+  },
   "1.0.2": {
     "en": "The app and device now show a photo of the Sleep Analyzer instead of a plain placeholder.",
     "no": "Appen og enheten viser nå et bilde av Sleep Analyzer i stedet for en ensfarget plassholder."
