@@ -1,4 +1,8 @@
 {
+  "1.1.1": {
+    "en": "The app icon is now the Withings wordmark, and the device has its own icon showing the mat instead of reusing the app icon.",
+    "no": "Appikonet er nå Withings-ordmerket, og enheten har fått sitt eget ikon som viser matten i stedet for å gjenbruke appikonet."
+  },
   "1.1.0": {
     "en": "Bed presence is now protected against repeated and out-of-order notifications, so a Flow runs once per real event. A restart no longer replays an old transition as a live one, and a lost subscription degrades the device instead of disabling it.",
     "no": "Sengetilstedeværelse er nå beskyttet mot gjentatte og omstokkede varsler, så en flyt kjører én gang per faktiske hendelse. En omstart spiller ikke lenger av en gammel overgang som om den var live, og et mistet abonnement gjør enheten degradert i stedet for utilgjengelig."
