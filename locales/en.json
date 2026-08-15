@@ -22,6 +22,7 @@
     "guide_step1_body": "Choose \"Public API integration\" as the type. Name it whatever you like. The Client ID and Secret appear on the overview page afterwards.",
     "guide_step1_urls": "Register both of these as Registered URLs:",
     "guide_step1_slash": "The trailing slash on the callback URL matters. Withings compares character by character, and login fails without it.",
+    "guide_step1_base": "Register the webhook URL without a query. Each Homey subscribes with its own id appended as ?homey=…, and the base URL covers them all. If a subscription is ever rejected as an unregistered URL, add the full form with your own Homey id as well.",
     "guide_step2": "2. Create a webhook at Homey",
     "guide_step2_body": "Create a new webhook and pick \"Query Parameter\" as the matching strategy. Copy the ID and Secret from there. Without a webhook the app still works, but polls instead of receiving events instantly.",
     "guide_step3": "3. Paste and test",

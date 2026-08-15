@@ -22,6 +22,7 @@
     "guide_step1_body": "Velg «Public API integration» som type. Kall den hva du vil. Etterpå finner du Client ID og Secret på oversiktssiden.",
     "guide_step1_urls": "Registrer begge disse som Registered URLs:",
     "guide_step1_slash": "Skråstreken på slutten av callback-URL-en må være med. Withings sammenligner tegn for tegn, og uten den feiler innloggingen.",
+    "guide_step1_base": "Webhook-URL-en registreres uten spørring. Hver Homey abonnerer med sin egen ID lagt til som ?homey=…, og basis-URL-en dekker dem alle. Blir et abonnement avvist som uregistrert URL, legg til den fulle formen med din egen Homey-ID i tillegg.",
     "guide_step2": "2. Opprett en webhook hos Homey",
     "guide_step2_body": "Lag en ny webhook og velg «Query Parameter» som matchingstrategi. Kopier ID og Secret derfra. Uten webhook virker appen fortsatt, men den poller i stedet for å få hendelser umiddelbart.",
     "guide_step3": "3. Lim inn og test",

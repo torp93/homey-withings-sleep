@@ -60,12 +60,24 @@ Register **both** of these URLs on the application:
 
 ```
 https://callback.athom.com/oauth2/callback/
+https://webhooks.athom.com/webhook/<WEBHOOK_ID>
+```
+
+The first is the OAuth redirect. The trailing slash on it matters:
+`WITHINGS_REDIRECT_URI` sends the slashed form, and Withings compares that one
+byte for byte.
+
+The second is the webhook base. Every installation subscribes with its own
+Homey appended as a query parameter:
+
+```
 https://webhooks.athom.com/webhook/<WEBHOOK_ID>/?homey=<HOMEY_ID>
 ```
 
-The first is the OAuth redirect, the second is where bed events are delivered.
-The trailing slash on the callback matters: Withings compares registered URLs
-byte for byte, and `WITHINGS_REDIRECT_URI` sends the slashed form.
+Registering the base covers all of them, which is what makes one Withings
+application usable by more than one Homey — the webhook ID is per app, the
+Homey ID is per install. If a subscription is ever rejected as an unregistered
+URL, add the full form with your own Homey ID as well.
 
 Copy the client ID and secret into `env.json`. The secret is shown once; use
 **Renew** on the application's overview page if you lose it or need to rotate.
