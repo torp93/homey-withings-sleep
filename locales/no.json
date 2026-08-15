@@ -7,7 +7,7 @@
   },
   "settings": {
     "credentials": "Legitimasjon",
-    "intro": "Fra Withings Partner Hub (Public API integration) og fra tools.developer.homey.app/webhooks.",
+    "intro": "Valgfritt. La feltene stå tomme for å bruke appens innebygde legitimasjon. Fyll dem bare ut hvis du vil bruke din egen Withings-applikasjon, fra Withings Partner Hub (Public API integration) og tools.developer.homey.app/webhooks.",
     "withings": "Withings-applikasjon",
     "client_id": "Client ID",
     "client_secret": "Client secret",
@@ -15,6 +15,19 @@
     "webhook_id": "Webhook-ID",
     "webhook_secret": "Webhook-secret",
     "save": "Lagre",
-    "saved": "Lagret. Start appen på nytt eller legg til enheten igjen for å ta i bruk."
+    "saved": "Lagret. Start appen på nytt eller legg til enheten igjen for å ta i bruk.",
+    "guide_title": "Slik setter du opp din egen Withings-applikasjon",
+    "guide_desktop": "Gjør dette på en PC. Åpne Homeys utviklerverktøy, velg appen og gå til App Settings — de samme feltene som her, men langt lettere å lime inn i:",
+    "guide_step1": "1. Opprett en applikasjon hos Withings",
+    "guide_step1_body": "Velg «Public API integration» som type. Kall den hva du vil. Etterpå finner du Client ID og Secret på oversiktssiden.",
+    "guide_step1_urls": "Registrer begge disse som Registered URLs:",
+    "guide_step1_slash": "Skråstreken på slutten av callback-URL-en må være med. Withings sammenligner tegn for tegn, og uten den feiler innloggingen.",
+    "guide_step2": "2. Opprett en webhook hos Homey",
+    "guide_step2_body": "Lag en ny webhook og velg «Query Parameter» som matchingstrategi. Kopier ID og Secret derfra. Uten webhook virker appen fortsatt, men den poller i stedet for å få hendelser umiddelbart.",
+    "guide_step3": "3. Lim inn og test",
+    "guide_step3_body": "Fyll inn de fire feltene over, trykk Lagre, og deretter Test tilkoblingen. Testen spør Withings om en nonce, som er det samme kallet appen bruker ved tokenfornyelse — går det gjennom, er ID og secret riktige.",
+    "test": "Test tilkoblingen",
+    "testing": "Tester…",
+    "test_failed": "Testen kunne ikke kjøres"
   }
 }

@@ -3,6 +3,28 @@
 <h2 data-i18n="settings.credentials"></h2>
 <p data-i18n="settings.intro"></p>
 
+<details>
+  <summary data-i18n="settings.guide_title"></summary>
+
+  <p data-i18n="settings.guide_desktop"></p>
+  <p><a class="ext" href="https://tools.developer.homey.app/apps">tools.developer.homey.app/apps</a></p>
+
+  <h4 data-i18n="settings.guide_step1"></h4>
+  <p><a class="ext" href="https://developer.withings.com/dashboard/create">developer.withings.com/dashboard/create</a></p>
+  <p data-i18n="settings.guide_step1_body"></p>
+  <p data-i18n="settings.guide_step1_urls"></p>
+  <pre>https://callback.athom.com/oauth2/callback/
+https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;/?homey=&lt;HOMEY-ID&gt;</pre>
+  <p data-i18n="settings.guide_step1_slash"></p>
+
+  <h4 data-i18n="settings.guide_step2"></h4>
+  <p><a class="ext" href="https://tools.developer.homey.app/webhooks">tools.developer.homey.app/webhooks</a></p>
+  <p data-i18n="settings.guide_step2_body"></p>
+
+  <h4 data-i18n="settings.guide_step3"></h4>
+  <p data-i18n="settings.guide_step3_body"></p>
+</details>
+
 <fieldset>
   <legend data-i18n="settings.withings"></legend>
 
@@ -27,7 +49,12 @@
   <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
 </p>
 
+<p>
+  <button id="test" class="homey-button-secondary-full" data-i18n="settings.test"></button>
+</p>
+
 <p id="status"></p>
+<pre id="result"></pre>
 
 <script type="application/javascript">
   const FIELDS = {
@@ -39,6 +66,17 @@
 
   function onHomeyReady(Homey) {
     const status = document.getElementById('status');
+
+    // A plain target="_blank" is a dead end inside the phone app's webview.
+    // Homey.openURL hands the link to the real browser where it exists; on
+    // desktop the normal navigation still works.
+    document.querySelectorAll('a.ext').forEach(link => {
+      link.addEventListener('click', event => {
+        if (typeof Homey.openURL !== 'function') return;
+        event.preventDefault();
+        Homey.openURL(link.href);
+      });
+    });
 
     // Load each stored value into its field.
     Object.entries(FIELDS).forEach(([elementId, key]) => {
@@ -67,6 +105,41 @@
             }
           }
         });
+      });
+    });
+
+    document.getElementById('test').addEventListener('click', () => {
+      const result = document.getElementById('result');
+
+      status.textContent = Homey.__('settings.testing');
+      result.textContent = '';
+
+      // Send whatever is in the fields, so an unsaved correction can be tested
+      // before it is committed. Blank fields let the app resolve its own value.
+      const payload = {};
+      Object.keys(FIELDS).forEach(elementId => {
+        payload[elementId] = document.getElementById(elementId).value.trim();
+      });
+
+      Homey.api('POST', '/testCredentials', payload, (err, res) => {
+        status.textContent = '';
+
+        if (err) {
+          result.textContent = `${Homey.__('settings.test_failed')}: ${err.message || err}`;
+          return;
+        }
+
+        const source = res.source.settings ? 'app settings'
+          : res.source.env ? 'env.json'
+            : 'lib/credentials.js';
+
+        result.textContent = [
+          `${res.withings.ok ? '✓' : '✗'} Withings — ${res.withings.message}`,
+          `${res.webhook.ok ? '✓' : '✗'} Webhook — ${res.webhook.message}`,
+          '',
+          `Client ID: ${res.clientId || '—'}`,
+          `Kilde: ${source}`
+        ].join('\n');
       });
     });
 

@@ -109,6 +109,38 @@ test('exchangeCode fetches a nonce, signs the request and stores tokens', async 
   );
 });
 
+test('verifyCredentials succeeds when Withings hands out a nonce', async () => {
+  const fetchImpl = fakeFetch([nonceResponse]);
+  const api = new WithingsApi({ clientId: CLIENT_ID, clientSecret: CLIENT_SECRET, fetchImpl });
+
+  assert.strictEqual(await api.verifyCredentials(), true);
+
+  // The signature is the whole point of the check: a wrong secret produces a
+  // wrong HMAC and Withings rejects it.
+  const call = fetchImpl.calls.find(c => c.url.includes('/v2/signature'));
+  assert.strictEqual(call.params.action, 'getnonce');
+  assert.strictEqual(
+    call.params.signature,
+    buildSignature(
+      { action: 'getnonce', client_id: CLIENT_ID, timestamp: call.params.timestamp },
+      CLIENT_SECRET
+    )
+  );
+});
+
+test('verifyCredentials surfaces a rejected signature as a WithingsError', async () => {
+  const fetchImpl = fakeFetch([
+    { path: '/v2/signature', body: { status: 503, error: 'Invalid signature' } }
+  ]);
+  const api = new WithingsApi({ clientId: CLIENT_ID, clientSecret: 'wrong', fetchImpl });
+
+  await assert.rejects(() => api.verifyCredentials(), err => {
+    assert.ok(err instanceof WithingsError);
+    assert.strictEqual(err.status, 503);
+    return true;
+  });
+});
+
 test('expiresAt is set a minute before the real deadline', async () => {
   const fetchImpl = fakeFetch([nonceResponse, tokenResponse({ expires_in: 3600 })]);
   const api = new WithingsApi({ clientId: CLIENT_ID, clientSecret: CLIENT_SECRET, fetchImpl });

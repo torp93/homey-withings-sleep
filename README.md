@@ -42,8 +42,11 @@ At the [Withings Partner Hub](https://developer.withings.com/), create a
 Set the callback URL to exactly:
 
 ```
-https://callback.athom.com/oauth2/callback
+https://callback.athom.com/oauth2/callback/
 ```
+
+The trailing slash matters. Withings compares registered URLs byte for byte,
+and `WITHINGS_REDIRECT_URI` sends the slashed form.
 
 Copy the client ID and secret into `env.json`.
 
