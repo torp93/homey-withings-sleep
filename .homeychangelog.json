@@ -1,4 +1,8 @@
 {
+  "1.1.0": {
+    "en": "Bed presence is now protected against repeated and out-of-order notifications, so a Flow runs once per real event. A restart no longer replays an old transition as a live one, and a lost subscription degrades the device instead of disabling it.",
+    "no": "Sengetilstedeværelse er nå beskyttet mot gjentatte og omstokkede varsler, så en flyt kjører én gang per faktiske hendelse. En omstart spiller ikke lenger av en gammel overgang som om den var live, og et mistet abonnement gjør enheten degradert i stedet for utilgjengelig."
+  },
   "1.0.6": {
     "en": "Device settings gain a Maintenance section with a manual subscription renewal, for when notifications show Lost and you do not want to wait for the scheduled check.",
     "no": "Enhetsinnstillingene har fått en Vedlikehold-seksjon med manuell fornyelse av abonnementet, for når varsling viser Mistet og du ikke vil vente på den planlagte sjekken."

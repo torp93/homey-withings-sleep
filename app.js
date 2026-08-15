@@ -34,15 +34,14 @@ class WithingsSleepApp extends Homey.App {
    * The CLI logs these values as "Homey.env" and uploads them with the build,
    * but on Homey Pro 13.4.0 `this.homey.env` reads empty in both a devkit
    * install and a store install. Rather than guess which accessor is the
-   * documented one, read all of them: the app works whichever is populated,
+   * documented one, read both: the app works whichever is populated,
    * and envSource() reports the winner so the ambiguity is observable instead
    * of theoretical.
    */
   get envSources() {
     return {
       'this.homey.env': this.homey.env || {},
-      'Homey.env': Homey.env || {},
-      'process.env': process.env || {}
+      'Homey.env': Homey.env || {}
     };
   }
 

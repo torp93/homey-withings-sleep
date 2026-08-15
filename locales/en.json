@@ -44,5 +44,9 @@
     "no_source": "no source, client secret missing",
     "env_probe": "Environment probe, which keys each source actually delivers:",
     "renew_started": "Renewal started. Check the Notifications status on the device in a few seconds."
+  },
+  "error": {
+    "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",
+    "subscription_degraded": "Realtime notifications from Withings are down. Bed presence still updates, but with a delay."
   }
 }

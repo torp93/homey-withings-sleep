@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -11,8 +11,8 @@
     "no": "Withings Sleep"
   },
   "description": {
-    "en": "Bed presence from the Withings Sleep Analyzer, with self-healing notification subscriptions.",
-    "no": "Sengetilstedeværelse fra Withings Sleep Analyzer, med selvreparerende varslingsabonnement."
+    "en": "Let your home react when you get into bed and when you get up.",
+    "no": "La hjemmet reagere når du legger deg og når du står opp."
   },
   "category": [
     "security"

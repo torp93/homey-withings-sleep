@@ -2,7 +2,19 @@
 
 const Homey = require('homey');
 const { WithingsApi } = require('../../lib/withings-api');
-const { parseNotification, deriveBedState } = require('../../lib/bed-state');
+const {
+  parseNotification,
+  deriveBedState,
+  shouldAcceptEvent,
+  rememberEvent
+} = require('../../lib/bed-state');
+
+/** Enough of an identifier to correlate log lines, too little to identify anyone. */
+function tag(value) {
+  if (!value) return '-';
+  const s = String(value);
+  return s.length <= 4 ? '…' : `…${s.slice(-4)}`;
+}
 
 class SleepAnalyzerDevice extends Homey.Device {
   async onInit() {
@@ -103,11 +115,11 @@ class SleepAnalyzerDevice extends Homey.Device {
   }
 
   _onWebhookMessage(args) {
-    const { body, query, headers } = args || {};
+    const { body, headers } = args || {};
 
-    // Logged before any filtering: a dropped notification is otherwise
-    // indistinguishable from one Withings never sent.
-    this.log(`Webhook hit. body(${typeof body})=${JSON.stringify(body)} query=${JSON.stringify(query)} content-type=${headers && headers['content-type']}`);
+    // Shape only. The payload carries a Withings user id and device id, so it
+    // is never logged verbatim.
+    this.log(`Webhook hit, body is ${typeof body}, content-type ${(headers && headers['content-type']) || 'unset'}`);
 
     const event = parseNotification(body);
     if (!event) {
@@ -117,15 +129,51 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     // One webhook serves the whole Homey; ignore other Withings profiles.
     if (this.userId && event.userId !== String(this.userId)) {
-      this.error(`Webhook for user ${event.userId} ignored; this device is user ${this.userId}.`);
+      this.error(`Webhook for user ${tag(event.userId)} ignored, this device is ${tag(this.userId)}.`);
       return;
     }
 
-    this.log(`Webhook: appli ${event.appli} → ${event.inBed ? 'in bed' : 'out of bed'}`);
+    // Several Sleep Analyzers on one account each have their own device id.
+    const boundDevice = this.getStoreValue('deviceId');
+    if (boundDevice && event.deviceId && event.deviceId !== boundDevice) {
+      this.error(`Webhook for mat ${tag(event.deviceId)} ignored, this device is ${tag(boundDevice)}.`);
+      return;
+    }
+
+    // Pairing cannot learn the mat's id; the first event carrying one binds it,
+    // so a second Sleep Analyzer added later cannot drive this device.
+    if (!boundDevice && event.deviceId) {
+      this.setStoreValue('deviceId', event.deviceId).catch(this.error);
+      this.log(`Bound to mat ${tag(event.deviceId)}.`);
+    }
+
+    const verdict = shouldAcceptEvent(event, {
+      seen: this.getStoreValue('seenEvents') || [],
+      lastEventMs: this.getStoreValue('lastEventMs') || null
+    });
+
+    if (!verdict.accept) {
+      // Not an error: Withings retrying is normal, and reordering happens.
+      this.log(`Ignoring ${event.inBed ? 'bed in' : 'bed out'} event, ${verdict.reason}.`);
+      return;
+    }
+
+    this.log(`Webhook: appli ${event.appli}, ${event.inBed ? 'in bed' : 'out of bed'}`);
 
     // Withings stamps the event itself; delivery adds a few seconds, so prefer
     // their clock over ours for the displayed time.
-    this._setBedState(event.inBed, event.date ? event.date * 1000 : Date.now());
+    const eventMs = event.date ? event.date * 1000 : Date.now();
+
+    this._recordEvent(verdict.key, eventMs)
+      .then(() => this._setBedState(event.inBed, eventMs))
+      .catch(err => this.error('Could not handle bed event:', err));
+  }
+
+  /** Persisted so a restart cannot replay an event Withings retries afterwards. */
+  async _recordEvent(key, eventMs) {
+    const seen = rememberEvent(key, this.getStoreValue('seenEvents') || []);
+    await this.setStoreValue('seenEvents', seen).catch(this.error);
+    await this.setStoreValue('lastEventMs', eventMs).catch(this.error);
   }
 
   /** Local wall-clock time, in Homey's own timezone. */
@@ -138,9 +186,25 @@ class SleepAnalyzerDevice extends Homey.Device {
     });
   }
 
-  async _setBedState(inBed, eventMs = Date.now()) {
+  /**
+   * @param {boolean} inBed
+   * @param {number} eventMs When Withings says it happened.
+   * @param {{silent?: boolean}} [options] `silent` updates state without firing
+   *   Flows. Used for reconciliation after a restart or an outage: the state is
+   *   real and must be corrected, but the transition already happened while
+   *   Homey was not listening, and replaying it as a live event would run
+   *   automations hours late, in the middle of the night.
+   */
+  async _setBedState(inBed, eventMs = Date.now(), { silent = false } = {}) {
     const previous = this.getCapabilityValue('withings_in_bed');
     await this.setCapabilityValue('withings_in_bed', inBed).catch(this.error);
+
+    if (silent && previous !== inBed) {
+      this.log(`State reconciled to ${inBed ? 'in bed' : 'out of bed'} without firing Flows.`);
+      await this.setStoreValue('stateSince', eventMs).catch(this.error);
+      await this._updateDurations();
+      return;
+    }
 
     if (previous === inBed) {
       // Same state, but the clock still moved.
@@ -208,13 +272,14 @@ class SleepAnalyzerDevice extends Homey.Device {
       const created = await this.api.ensureSubscriptions(this.webhookUrl);
       const wasOk = this.getCapabilityValue('withings_subscription_ok');
 
-      // What Withings believes it will call, in its own words.
+      // Count only. The profiles carry callback URLs with identifiers in them.
       for (const appli of WithingsApi.BED_APPLIS) {
         const profiles = await this.api.listSubscriptions(appli);
-        this.log(`Withings subscriptions for appli ${appli}: ${JSON.stringify(profiles)}`);
+        this.log(`Withings reports ${profiles.length} subscription(s) for appli ${appli}.`);
       }
 
       await this.setCapabilityValue('withings_subscription_ok', true).catch(this.error);
+      await this.unsetWarning().catch(() => {});
       await this.setAvailable().catch(this.error);
 
       if (created.length > 0) {
@@ -229,9 +294,21 @@ class SleepAnalyzerDevice extends Homey.Device {
 
       return true;
     } catch (err) {
-      this.error('Subscription renewal failed:', err);
+      this.error(`Subscription renewal failed (status ${err.status ?? 'none'}).`);
       await this.setCapabilityValue('withings_subscription_ok', false).catch(this.error);
-      await this.setUnavailable(`Withings: ${err.message}`).catch(this.error);
+
+      // A lost subscription is a degraded service, not a dead device: polling
+      // still reports bed presence. Only an authorization that cannot be
+      // repaired without the user makes the device genuinely unusable.
+      const needsReauth = err.status === 401 || err.status === 403;
+
+      if (needsReauth) {
+        await this.setUnavailable(this.homey.__('error.reauthorize')).catch(this.error);
+      } else {
+        await this.setWarning(this.homey.__('error.subscription_degraded')).catch(() => {});
+        await this.setAvailable().catch(this.error);
+      }
+
       return false;
     }
   }
@@ -242,7 +319,14 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     try {
       const series = await this.api.getSleepSeries(now - window * 2, now);
-      await this._setBedState(deriveBedState(series, now, window));
+
+      // The first poll after start is reconciliation, not a live observation:
+      // whatever it finds happened before this process was listening. Later
+      // polls are the live source for installations without a webhook.
+      const silent = !this._reconciled;
+      this._reconciled = true;
+
+      await this._setBedState(deriveBedState(series, now, window), Date.now(), { silent });
       await this.setAvailable().catch(this.error);
     } catch (err) {
       // A token issued before user.activity was requested cannot read the
