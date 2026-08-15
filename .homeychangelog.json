@@ -1,4 +1,8 @@
 {
+  "1.0.5": {
+    "en": "Each installation now uses its own Withings application and Homey webhook, entered in the app settings. No credentials are shipped with the app.",
+    "no": "Hver installasjon bruker nå sin egen Withings-applikasjon og Homey-webhook, lagt inn i appinnstillingene. Ingen legitimasjon følger med appen."
+  },
   "1.0.4": {
     "en": "Diagnostics: the connection test now reports which environment source delivers each credential.",
     "no": "Diagnostikk: tilkoblingstesten viser nå hvilken miljøkilde som leverer hver enkelt nøkkel."

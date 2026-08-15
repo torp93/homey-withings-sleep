@@ -7,7 +7,7 @@
   },
   "settings": {
     "credentials": "Credentials",
-    "intro": "Optional. Leave blank to use the app's built-in credentials. Fill these in only if you want to use your own Withings application, from the Withings Partner Hub (Public API integration) and tools.developer.homey.app/webhooks.",
+    "intro": "The app needs your own Withings application. Fill in the fields below; the guide shows how to obtain the values.",
     "withings": "Withings application",
     "client_id": "Withings Client ID",
     "client_secret": "Withings Client secret",

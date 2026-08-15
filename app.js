@@ -89,8 +89,14 @@ class WithingsSleepApp extends Homey.App {
     return this._config('WEBHOOK_SECRET');
   }
 
+  /**
+   * The trailing slash is deliberate: this is the form Homey's OAuth callback
+   * actually uses, and Withings compares registered URLs byte for byte. The
+   * unslashed variant fails with an opaque redirect_uri_mismatch. Overridable
+   * only for the case where a future Athom change drops the slash.
+   */
   get redirectUri() {
-    return this._config('WITHINGS_REDIRECT_URI') || 'https://callback.athom.com/oauth2/callback';
+    return this._config('WITHINGS_REDIRECT_URI') || 'https://callback.athom.com/oauth2/callback/';
   }
 
   get hasWebhookConfig() {

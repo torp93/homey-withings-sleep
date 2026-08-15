@@ -26,15 +26,18 @@ visible instead of silent.
 
 ## Setup
 
-**This section is for running the app from source.** People who install the app
-from the Homey App Store do none of it: they add the device and sign in with
-their own Withings account when pairing. The app owner's credentials reach the
-app through `Homey.env`, so nothing is asked of the user.
+**Everyone does this, not just developers.** Each installation uses its own
+Withings application and its own Homey webhook, entered on the app's settings
+page. Published builds ship with an empty environment on purpose, so none of
+the author's credentials are distributed or stored at Athom.
 
-Three things must exist before a source checkout can pair, and two of them
-require accounts only you can create. Do them in this order — the Withings
-application needs the webhook ID, so registering the webhook first saves a
-round trip.
+`Homey.env` would be the mechanism for shipping shared credentials, but on
+Homey Pro 13.4.0 it reads empty in a devkit install and a store install alike.
+`app.js` still reads it, along with the other places it could surface, so the
+app picks the values up if that is ever fixed.
+
+Do the steps in this order, since the Withings application needs the webhook
+ID: registering the webhook first saves a round trip.
 
 ### 1. Register a Homey webhook
 
