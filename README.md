@@ -31,40 +31,50 @@ from the Homey App Store do none of it: they add the device and sign in with
 their own Withings account when pairing. The app owner's credentials reach the
 app through `Homey.env`, so nothing is asked of the user.
 
-Three things must exist before a source checkout can pair. Two of them require
-accounts only you can create.
+Three things must exist before a source checkout can pair, and two of them
+require accounts only you can create. Do them in this order — the Withings
+application needs the webhook ID, so registering the webhook first saves a
+round trip.
 
-### 1. Register a Withings application
-
-At the [Withings Partner Hub](https://developer.withings.com/), create a
-**Public Health Data API** application.
-
-Set the callback URL to exactly:
-
-```
-https://callback.athom.com/oauth2/callback/
-```
-
-The trailing slash matters. Withings compares registered URLs byte for byte,
-and `WITHINGS_REDIRECT_URI` sends the slashed form.
-
-Copy the client ID and secret into `env.json`.
-
-The app requests the `user.info`, `user.metrics` and `user.sleepevents` scopes.
-**`user.sleepevents` is the one that carries bed-in/bed-out** — without it the
-subscriptions succeed but no events are ever delivered.
-
-### 2. Register a Homey webhook
+### 1. Register a Homey webhook
 
 At [tools.developer.homey.app/webhooks](https://tools.developer.homey.app/webhooks),
-create a new webhook and copy its ID and secret into `env.json`.
+create a new webhook and pick **Query Parameter** as the matching strategy.
+That is what makes `?homey=<homeyId>` route an incoming POST to the right
+Homey. Copy its ID and secret into `env.json`.
 
-This is what gives Withings a public HTTPS endpoint to POST to. Withings
-requires a real domain on port 443 that answers `HEAD` with a 2xx — Athom's
-webhook service satisfies this.
+This gives Withings a public HTTPS endpoint to POST to. Withings requires a
+real domain on port 443 that answers `HEAD` with a 2xx — Athom's webhook
+service satisfies this.
 
 Without it the app still works, but falls back to polling and loses realtime
 triggering.
+
+### 2. Register a Withings application
+
+At [developer.withings.com/dashboard/create](https://developer.withings.com/dashboard/create),
+create a **Public API integration**. The other integration types are only
+available under contract.
+
+Register **both** of these URLs on the application:
+
+```
+https://callback.athom.com/oauth2/callback/
+https://webhooks.athom.com/webhook/<WEBHOOK_ID>/?homey=<HOMEY_ID>
+```
+
+The first is the OAuth redirect, the second is where bed events are delivered.
+The trailing slash on the callback matters: Withings compares registered URLs
+byte for byte, and `WITHINGS_REDIRECT_URI` sends the slashed form.
+
+Copy the client ID and secret into `env.json`. The secret is shown once; use
+**Renew** on the application's overview page if you lose it or need to rotate.
+
+The app requests the `user.info`, `user.metrics`, `user.activity` and
+`user.sleepevents` scopes. **`user.sleepevents` is the one that carries
+bed-in/bed-out** — without it the subscriptions succeed but no events are ever
+delivered. `user.activity` is what the polling fallback needs; without it the
+`v2/sleep` call returns 403 while the webhook path keeps working.
 
 ### 3. Fill in `env.json`
 
@@ -91,9 +101,18 @@ rather than relying on the CLI's defaults.
 `app.js` resolves each key as an app-settings override first, then `Homey.env`.
 There is no third source and no credentials compiled into the source tree.
 
-If a key turns up empty at runtime, use the **Test connection** button on the
-app's settings page: it reports which of the two sources supplied the value,
-without revealing it.
+### 4. Verify
+
+Open the app's settings and press **Test connection**. It asks Withings for a
+nonce — the same signed call the app makes when refreshing a token, so a wrong
+secret fails there exactly as it would in use — and sends `HEAD` to the webhook
+the way Withings does before accepting a subscription. It also reports which
+source supplied the credentials, without revealing them.
+
+The settings page carries the same instructions in a collapsible guide, so you
+do not need this file while setting up. Doing it from a desktop browser at
+[tools.developer.homey.app/apps](https://tools.developer.homey.app/apps) is far
+easier than typing keys on a phone.
 
 ## How it works
 
