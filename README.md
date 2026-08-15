@@ -122,9 +122,10 @@ the way Withings does before accepting a subscription. It also reports which
 source supplied the credentials, without revealing them.
 
 The settings page carries the same instructions in a collapsible guide, so you
-do not need this file while setting up. Doing it from a desktop browser at
-[tools.developer.homey.app/apps](https://tools.developer.homey.app/apps) is far
-easier than typing keys on a phone.
+do not need this file while setting up. It works from the phone — the guide
+prints the subscription URL with a copy button — but a desktop browser at
+[tools.developer.homey.app/apps](https://tools.developer.homey.app/apps) makes
+pasting long keys easier, and you will be in a browser at Withings anyway.
 
 ## How it works
 

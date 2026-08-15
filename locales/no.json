@@ -21,7 +21,7 @@
     "test_failed": "Testen kunne ikke kjøres",
     "webhook_url_hint": "Denne Homeyens abonnements-URL. Trenger du å registrere den fulle formen hos Withings, er det denne strengen som skal limes inn:",
     "guide_title": "Slik setter du opp din egen Withings-applikasjon",
-    "guide_desktop": "Gjør dette på en PC. Åpne Homeys utviklerverktøy, velg appen og gå til App Settings — de samme feltene som her, men langt lettere å lime inn i:",
+    "guide_desktop": "Dette går fint fra telefonen, men er lettere på en PC — lange nøkler er enklere å lime inn, og du er uansett innom Withings i nettleseren. Homeys utviklerverktøy har de samme feltene under App Settings:",
     "guide_order": "Ta stegene i denne rekkefølgen — webhook-ID-en er en del av URL-en du registrerer hos Withings, så webhooken må lages først.",
     "guide_step1": "1. Opprett en webhook hos Homey",
     "guide_step1_body": "Lag en ny webhook og velg «Query Parameter» som matchingstrategi. Det er den som gjør at ?homey=… sender hendelsen til riktig Homey. Kopier ID og Secret inn i feltene under. Uten webhook virker appen fortsatt, men poller i stedet for å få hendelser umiddelbart.",

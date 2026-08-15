@@ -21,7 +21,7 @@
     "test_failed": "Could not run the test",
     "webhook_url_hint": "This Homey's subscription URL. If you need to register the full form at Withings, this is the string to paste:",
     "guide_title": "How to set up your own Withings application",
-    "guide_desktop": "Do this on a computer. Open Homey's developer tools, pick the app and go to App Settings — the same fields as here, but far easier to paste into:",
+    "guide_desktop": "This works fine from the phone, but is easier on a computer — long keys are simpler to paste, and you will be in a browser at Withings anyway. Homey's developer tools have the same fields under App Settings:",
     "guide_order": "Take the steps in this order — the webhook id is part of the URL you register at Withings, so the webhook has to exist first.",
     "guide_step1": "1. Create a webhook at Homey",
     "guide_step1_body": "Create a new webhook and pick \"Query Parameter\" as the matching strategy. That is what routes ?homey=… to the right Homey. Copy the ID and Secret into the fields below. Without a webhook the app still works, but polls instead of receiving events instantly.",
