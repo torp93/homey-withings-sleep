@@ -16,6 +16,12 @@ This app verifies both bed subscriptions on a timer and recreates any that have
 vanished, exposing the subscription state as a capability so the failure is
 visible instead of silent.
 
+## Screenshots
+
+| Device | Insights |
+| --- | --- |
+| ![Device view](docs/screenshots/device.jpg) | ![Insights](docs/screenshots/insights.jpg) |
+
 ## Setup
 
 Three things must exist before the app can pair. Two of them require accounts
