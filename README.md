@@ -119,7 +119,24 @@ Use `--remote`. Without it, CLI v4 builds the app into a local Docker container
 and requires Docker Desktop to be running; `--remote` uploads straight to the
 Homey Pro instead and needs no Docker.
 
-## Status
+## Publishing
 
-The placeholder artwork in `assets/` and `drivers/sleep_analyzer/assets/` is
-flat brand-colour fill, sized to pass validation. Replace before publishing.
+The app is at 1.0.0 and passes `homey app validate --level publish`.
+
+```bash
+npm test
+npm run validate            # publish level
+homey app publish
+```
+
+`homey app publish` uploads a build to the Homey App Store and opens it for
+Athom's review. The version in `app.json` must be bumped for every submission,
+and every version needs a matching entry in `.homeychangelog.json`.
+
+Two things are still open before submitting:
+
+- **Artwork.** `assets/` and `drivers/sleep_analyzer/assets/` hold flat
+  brand-colour fills, correctly sized but placeholder. Athom reviews artwork.
+- **Brand name.** The app is called "Withings Sleep" and uses Withings' brand
+  colour. Athom's guidelines restrict using a manufacturer's name and marks
+  without permission; the store listing may need renaming.

@@ -1,0 +1,6 @@
+{
+  "1.0.0": {
+    "en": "First release. Bed presence from the Withings Sleep Analyzer, with bedtime, wake-up time and time in and out of bed. The bed-in and bed-out notification subscriptions are verified on a timer and recreated when they lapse, and a flow trigger tells you if that ever happens.",
+    "no": "Første utgivelse. Sengetilstedeværelse fra Withings Sleep Analyzer, med leggetid, tidspunkt du stod opp, og tid i og ute av sengen. Varslingsabonnementene for seng inn og seng ut verifiseres jevnlig og gjenopprettes hvis de faller bort, og et flytkort varsler deg hvis det skjer."
+  }
+}

@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": ["local"],
@@ -14,8 +14,28 @@
   },
   "category": ["security"],
   "brandColor": "#00857C",
+  "tags": {
+    "en": ["withings", "sleep", "sleep analyzer", "bed", "presence", "bed sensor", "sleep tracking"],
+    "no": ["withings", "søvn", "sleep analyzer", "seng", "tilstedeværelse", "sengesensor", "søvnmåling"]
+  },
+  "permissions": [],
   "author": {
-    "name": "Thomas Torp"
+    "name": "Thomas Torp",
+    "email": "torp93@users.noreply.github.com"
+  },
+  "contributors": {
+    "developers": [
+      {
+        "name": "Thomas Torp",
+        "email": "torp93@users.noreply.github.com"
+      }
+    ]
+  },
+  "source": "https://github.com/torp93/homey-withings-sleep",
+  "homepage": "https://github.com/torp93/homey-withings-sleep",
+  "support": "https://github.com/torp93/homey-withings-sleep/issues",
+  "bugs": {
+    "url": "https://github.com/torp93/homey-withings-sleep/issues"
   },
   "images": {
     "small": "/assets/images/small.png",
