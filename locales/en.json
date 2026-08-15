@@ -29,6 +29,7 @@
     "guide_step3_body": "Fill in the four fields above, press Save, then Test connection. The test asks Withings for a nonce, the same call the app makes when refreshing a token — if it succeeds, the ID and secret are right.",
     "test": "Test connection",
     "testing": "Testing…",
-    "test_failed": "Could not run the test"
+    "test_failed": "Could not run the test",
+    "webhook_url_hint": "This Homey's subscription URL. If you need to register the full form at Withings, this is the string to paste:"
   }
 }

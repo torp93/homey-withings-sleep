@@ -32,6 +32,10 @@ module.exports = {
         env: Boolean((homey.env || {}).WITHINGS_CLIENT_SECRET)
       },
       clientId: describe(clientId),
+      homeyId: null,
+      // The exact string this Homey subscribes with. Shown so nobody has to go
+      // hunting for their Homey id in the developer tools.
+      webhookUrl: null,
       withings: { ok: false, message: '' },
       webhook: { ok: false, message: '' }
     };
@@ -55,12 +59,23 @@ module.exports = {
     }
 
     // --- Webhook ------------------------------------------------------------
+    try {
+      result.homeyId = await homey.cloud.getHomeyId();
+    } catch {
+      // Reported below; the Withings result above is still worth returning.
+    }
+
     if (!webhookId || !webhookSecret) {
       result.webhook.message = 'Ikke satt opp — appen faller tilbake til polling.';
     } else {
       try {
-        const homeyId = await homey.cloud.getHomeyId();
-        const url = `https://webhooks.athom.com/webhook/${webhookId}?homey=${homeyId}`;
+        const homeyId = result.homeyId;
+        if (!homeyId) throw new Error('fant ikke Homey-ID');
+
+        // Must match drivers/sleep_analyzer/device.js exactly: this is the
+        // string Withings is asked to deliver to.
+        const url = `https://webhooks.athom.com/webhook/${webhookId}/?homey=${homeyId}`;
+        result.webhookUrl = url;
 
         // Withings requires the callback to answer HEAD with a 2xx before it
         // will accept a subscription, so that is exactly what we check.

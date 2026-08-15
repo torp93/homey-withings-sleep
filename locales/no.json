@@ -29,6 +29,7 @@
     "guide_step3_body": "Fyll inn de fire feltene over, trykk Lagre, og deretter Test tilkoblingen. Testen spør Withings om en nonce, som er det samme kallet appen bruker ved tokenfornyelse — går det gjennom, er ID og secret riktige.",
     "test": "Test tilkoblingen",
     "testing": "Tester…",
-    "test_failed": "Testen kunne ikke kjøres"
+    "test_failed": "Testen kunne ikke kjøres",
+    "webhook_url_hint": "Denne Homeyens abonnements-URL. Trenger du å registrere den fulle formen hos Withings, er det denne strengen som skal limes inn:"
   }
 }

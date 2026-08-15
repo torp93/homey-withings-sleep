@@ -139,7 +139,11 @@ https://webhooks.athom.com/webhook/&lt;WEBHOOK-ID&gt;</pre>
           `${res.webhook.ok ? '✓' : '✗'} Webhook — ${res.webhook.message}`,
           '',
           `Client ID: ${res.clientId || '—'}`,
-          `Kilde: ${source}`
+          `Kilde: ${source}`,
+          `Homey ID: ${res.homeyId || '—'}`,
+          '',
+          Homey.__('settings.webhook_url_hint'),
+          res.webhookUrl || '—'
         ].join('\n');
       });
     });
