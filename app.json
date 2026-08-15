@@ -19,6 +19,12 @@
     "no": ["withings", "søvn", "sleep analyzer", "seng", "tilstedeværelse", "sengesensor", "søvnmåling"]
   },
   "permissions": [],
+  "api": {
+    "testCredentials": {
+      "method": "POST",
+      "path": "/testCredentials"
+    }
+  },
   "author": {
     "name": "Thomas Torp",
     "email": "torp93@users.noreply.github.com"
