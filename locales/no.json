@@ -49,5 +49,9 @@
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",
     "subscription_degraded": "Sanntidsvarsler fra Withings er nede. Sengetilstedeværelse oppdateres fortsatt, men med forsinkelse."
+  },
+  "units": {
+    "hour": "t",
+    "minute": "min"
   }
 }

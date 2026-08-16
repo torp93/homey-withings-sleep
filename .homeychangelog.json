@@ -1,4 +1,16 @@
 {
+  "1.5.1": {
+    "en": "Sleep score no longer declares an empty unit, and the version bump makes Homey pick up the new fields.",
+    "no": "Søvnscore oppgir ikke lenger en tom enhet, og versjonshevingen gjør at Homey plukker opp de nye feltene."
+  },
+  "1.5.0": {
+    "en": "Last night now updates by itself in the morning, and brings sleep score, average heart rate, average breathing rate and snoring with it. New Flow cards: a trigger when a sleep summary is ready, a trigger when the Withings connection needs authorizing again, and a condition for how long someone has been in bed.",
+    "no": "Siste natt oppdaterer seg nå selv om morgenen, og tar med søvnscore, gjennomsnittspuls, gjennomsnittlig pustefrekvens og snorking. Nye flytkort: utløser når en søvnoppsummering er klar, utløser når Withings-tilkoblingen må godkjennes på nytt, og en betingelse for hvor lenge noen har ligget i sengen."
+  },
+  "1.4.0": {
+    "en": "Each duration now also appears in readable form, such as 7 h 7 min, next to the minute value that Insights and Flow cards use.",
+    "no": "Hver varighet vises nå også i lesbar form, som 7 t 7 min, ved siden av minuttverdien som Insights og flytkort bruker."
+  },
   "1.3.2": {
     "en": "The duration counters now write a line to the app log each minute, so a counter that has stopped can be told from one that was never running.",
     "no": "Varighetstellerne skriver nå en linje i apploggen hvert minutt, så en teller som har stoppet kan skilles fra en som aldri kjørte."

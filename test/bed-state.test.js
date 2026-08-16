@@ -262,3 +262,85 @@ test('deriveBedState says unknown, not empty, when there is no data', () => {
   assert.strictEqual(deriveBedState([{ enddate: now - 60 }], now, 300), true);
   assert.strictEqual(deriveBedState([{ enddate: now - 9999 }], now, 300), false);
 });
+
+// --- Readable durations -----------------------------------------------------
+
+const { formatDuration } = require('../lib/bed-state');
+
+test('formatDuration uses the unit words it is given', () => {
+  // Homey does not translate capability values, so the language comes from
+  // the caller. Norwegian says "t", English says "h".
+  const no = { hour: 't', minute: 'min' };
+  const en = { hour: 'h', minute: 'min' };
+
+  assert.strictEqual(formatDuration(487, no), '8 t 7 min');
+  assert.strictEqual(formatDuration(487, en), '8 h 7 min');
+  assert.strictEqual(formatDuration(120, no), '2 t');
+  assert.strictEqual(formatDuration(45, no), '45 min');
+});
+
+test('formatDuration reads naturally at every scale', () => {
+  assert.strictEqual(formatDuration(0), '0 min');
+  assert.strictEqual(formatDuration(45), '45 min');
+  assert.strictEqual(formatDuration(60), '1 h', 'a whole hour drops the minutes');
+  assert.strictEqual(formatDuration(61), '1 h 1 min');
+  assert.strictEqual(formatDuration(74), '1 h 14 min');
+  assert.strictEqual(formatDuration(120), '2 h');
+  assert.strictEqual(formatDuration(487), '8 h 7 min');
+});
+
+test('formatDuration returns null for nothing to show, not a fake zero', () => {
+  // The caller leaves the capability blank instead of claiming zero minutes.
+  assert.strictEqual(formatDuration(null), null);
+  assert.strictEqual(formatDuration(undefined), null);
+  assert.strictEqual(formatDuration('nonsense'), null);
+  assert.strictEqual(formatDuration(-5), null);
+});
+
+// --- Night metrics ----------------------------------------------------------
+
+const { readMetrics } = require('../lib/bed-state');
+
+test('readMetrics converts snoring to minutes and passes the rest through', () => {
+  const m = readMetrics({ sleep_score: 78, hr_average: 54, rr_average: 14, snoring: 1380 });
+
+  assert.strictEqual(m.sleepScore, 78);
+  assert.strictEqual(m.heartRate, 54);
+  assert.strictEqual(m.breathingRate, 14);
+  assert.strictEqual(m.snoringMinutes, 23, '1380 seconds');
+});
+
+test('readMetrics keeps missing measurements missing', () => {
+  // Zero would be a claim: a resting pulse of nothing, or snoring measured at
+  // none. The device skips nulls so the capability stays blank instead.
+  const m = readMetrics({ sleep_score: 80 });
+
+  assert.strictEqual(m.sleepScore, 80);
+  assert.strictEqual(m.heartRate, null);
+  assert.strictEqual(m.breathingRate, null);
+  assert.strictEqual(m.snoringMinutes, null);
+});
+
+test('readMetrics survives a summary with no data at all', () => {
+  const m = readMetrics(undefined);
+
+  assert.deepStrictEqual(m, {
+    sleepScore: null, heartRate: null, breathingRate: null, snoringMinutes: null
+  });
+});
+
+test('readMetrics ignores values that are not numbers', () => {
+  const m = readMetrics({ sleep_score: 'n/a', snoring: null });
+
+  assert.strictEqual(m.sleepScore, null);
+  assert.strictEqual(m.snoringMinutes, null);
+});
+
+test('summariseLastNight carries the metrics of the night it picked', () => {
+  const night = summariseLastNight([
+    { startdate: 100, enddate: 200, data: { sleep_score: 10 } },
+    { startdate: 300, enddate: 400, data: { sleep_score: 99 } }
+  ]);
+
+  assert.strictEqual(night.metrics.sleepScore, 99, 'the newest night, not the first');
+});

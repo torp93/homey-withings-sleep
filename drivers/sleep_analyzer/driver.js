@@ -8,6 +8,8 @@ class SleepAnalyzerDriver extends Homey.Driver {
     this.bedInTrigger = this.homey.flow.getDeviceTriggerCard('withings_bed_in');
     this.bedOutTrigger = this.homey.flow.getDeviceTriggerCard('withings_bed_out');
     this.subscriptionLostTrigger = this.homey.flow.getDeviceTriggerCard('withings_subscription_lost');
+    this.summaryReadyTrigger = this.homey.flow.getDeviceTriggerCard('withings_summary_ready');
+    this.reauthorizeTrigger = this.homey.flow.getDeviceTriggerCard('withings_reauthorize_needed');
   }
 
   async onPair(session) {

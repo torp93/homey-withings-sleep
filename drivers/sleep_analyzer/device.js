@@ -7,7 +7,8 @@ const {
   deriveBedState,
   shouldAcceptEvent,
   rememberEvent,
-  summariseLastNight
+  summariseLastNight,
+  formatDuration
 } = require('../../lib/bed-state');
 
 /** Enough of an identifier to correlate log lines, too little to identify anyone. */
@@ -61,7 +62,14 @@ class SleepAnalyzerDevice extends Homey.Device {
       'withings_time_in_bed',
       'withings_time_out_of_bed',
       'withings_last_sleep_duration',
-      'withings_subscription_ok'
+      'withings_subscription_ok',
+      'withings_time_in_bed_text',
+      'withings_time_out_of_bed_text',
+      'withings_last_sleep_text',
+      'withings_sleep_score',
+      'withings_heart_rate',
+      'withings_breathing_rate',
+      'withings_snoring'
     ];
 
     for (const capability of wanted) {
@@ -185,6 +193,75 @@ class SleepAnalyzerDevice extends Homey.Device {
     await this.setStoreValue('lastEventMs', eventMs).catch(this.error);
   }
 
+  /**
+   * Write whatever Withings measured, and leave the rest alone.
+   *
+   * A mat that did not record snoring, or a night Withings has not scored,
+   * returns null for that field. Writing zero would be a measurement claim we
+   * cannot make, so nulls are skipped and the capability keeps its last real
+   * value or stays blank.
+   */
+  async _writeMetrics(metrics) {
+    const map = {
+      withings_sleep_score: metrics && metrics.sleepScore,
+      withings_heart_rate: metrics && metrics.heartRate,
+      withings_breathing_rate: metrics && metrics.breathingRate,
+      withings_snoring: metrics && metrics.snoringMinutes
+    };
+
+    const written = [];
+
+    for (const [capability, value] of Object.entries(map)) {
+      if (value === null || value === undefined) continue;
+      await this.setCapabilityValue(capability, value).catch(this.error);
+      written.push(capability.replace('withings_', ''));
+    }
+
+    if (written.length) this.log(`Night metrics: ${written.join(', ')}.`);
+  }
+
+  /**
+   * Chase the summary after getting up.
+   *
+   * Withings scores a night some time after it ends, and there is no way to
+   * ask when that will be. Rather than poll all day, try a few times with
+   * growing gaps and stop as soon as a night newer than the bed-out appears.
+   */
+  _scheduleSummaryChase(afterMs) {
+    for (const timer of this._chaseTimers || []) this.homey.clearTimeout(timer);
+    this._chaseTimers = [];
+
+    const delaysMinutes = [10, 30, 60, 120, 240];
+
+    for (const minutes of delaysMinutes) {
+      const timer = this.homey.setTimeout(async () => {
+        if (this._summarySeenMs && this._summarySeenMs >= afterMs) return;
+
+        try {
+          await this._backfillLastNight({ announce: true, newerThanMs: afterMs });
+        } catch (err) {
+          this.error('Summary chase failed:', err.message);
+        }
+      }, minutes * 60 * 1000);
+
+      this._chaseTimers.push(timer);
+    }
+
+    this.log(`Will look for a scored night in ${delaysMinutes.join(', ')} minutes.`);
+  }
+
+  /**
+   * The unit words for this Homey's language. Homey translates labels but not
+   * capability values, so a duration string has to be assembled with words we
+   * look up ourselves, or a Norwegian "t" would show up in an English UI.
+   */
+  get _durationUnits() {
+    return {
+      hour: this.homey.__('units.hour'),
+      minute: this.homey.__('units.minute')
+    };
+  }
+
   /** Calendar day in Homey's timezone, as Withings wants it: YYYY-MM-DD. */
   _ymd(epochMs) {
     return new Date(epochMs).toLocaleDateString('en-CA', {
@@ -203,7 +280,7 @@ class SleepAnalyzerDevice extends Homey.Device {
    * Deliberately does not touch withings_in_bed and fires no Flows: this is
    * history being displayed, not a transition happening now.
    */
-  async _backfillLastNight() {
+  async _backfillLastNight({ announce = false, newerThanMs = 0 } = {}) {
     const now = Date.now();
     const from = this._ymd(now - 2 * 24 * 3600 * 1000);
     const to = this._ymd(now);
@@ -216,6 +293,13 @@ class SleepAnalyzerDevice extends Homey.Device {
       return;
     }
 
+    if (night.endMs < newerThanMs) {
+      this.log('Backfill: the newest scored night predates the last bed-out, still waiting.');
+      return;
+    }
+
+    this._summarySeenMs = night.endMs;
+
     // Never overwrite a value this session already learned from a live event;
     // that one is newer than anything a summary can offer.
     if (!this.getCapabilityValue('withings_bedtime')) {
@@ -226,11 +310,29 @@ class SleepAnalyzerDevice extends Homey.Device {
       await this.setCapabilityValue('withings_wakeup_time', this._formatClock(night.endMs)).catch(this.error);
     }
 
-    if (!this.getCapabilityValue('withings_last_sleep_duration')) {
+    if (announce || !this.getCapabilityValue('withings_last_sleep_duration')) {
       await this.setCapabilityValue('withings_last_sleep_duration', night.minutes).catch(this.error);
+      await this.setCapabilityValue('withings_last_sleep_text', formatDuration(night.minutes, this._durationUnits)).catch(this.error);
     }
 
+    await this._writeMetrics(night.metrics);
+
     this.log(`Backfill: last night was ${night.minutes} min, ${this._formatClock(night.startMs)} to ${this._formatClock(night.endMs)}.`);
+
+    if (announce) {
+      for (const timer of this._chaseTimers || []) this.homey.clearTimeout(timer);
+      this._chaseTimers = [];
+
+      const m = night.metrics || {};
+      this.driver.summaryReadyTrigger.trigger(this, {
+        minutes: night.minutes,
+        readable: formatDuration(night.minutes, this._durationUnits) || '',
+        score: m.sleepScore ?? 0,
+        heart_rate: m.heartRate ?? 0,
+        breathing_rate: m.breathingRate ?? 0,
+        snoring: m.snoringMinutes ?? 0
+      }).catch(err => this.error('Summary trigger failed:', err.message));
+    }
 
     // A completed session that ended after the state last changed means the
     // bed-out happened while nobody was listening: a power cut, an outage, or
@@ -303,7 +405,12 @@ class SleepAnalyzerDevice extends Homey.Device {
     // makes a readable Insights series, unlike the sawtooth of a live counter.
     if (previous === true && inBed === false) {
       const minutes = Math.max(0, Math.round((eventMs - since) / 60000));
+
+      // Withings has not scored the night yet; go looking for it shortly.
+      this._scheduleSummaryChase(eventMs);
+
       await this.setCapabilityValue('withings_last_sleep_duration', minutes).catch(this.error);
+      await this.setCapabilityValue('withings_last_sleep_text', formatDuration(minutes, this._durationUnits)).catch(this.error);
       this.log(`Completed bed session: ${minutes} min`);
     }
 
@@ -328,6 +435,11 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     await this.setCapabilityValue('withings_time_in_bed', inBed ? minutes : 0).catch(this.error);
     await this.setCapabilityValue('withings_time_out_of_bed', inBed ? 0 : minutes).catch(this.error);
+
+    // The readable twin of each counter. The numbers stay authoritative for
+    // Insights and Flow comparisons; these exist only to be read.
+    await this.setCapabilityValue('withings_time_in_bed_text', formatDuration(inBed ? minutes : 0, this._durationUnits)).catch(this.error);
+    await this.setCapabilityValue('withings_time_out_of_bed_text', formatDuration(inBed ? 0 : minutes, this._durationUnits)).catch(this.error);
 
     // Counters that stop moving look identical to counters that were never
     // running. One line per minute makes the difference visible in the log.
@@ -381,6 +493,7 @@ class SleepAnalyzerDevice extends Homey.Device {
 
       if (needsReauth) {
         await this.setUnavailable(this.homey.__('error.reauthorize')).catch(this.error);
+        this.driver.reauthorizeTrigger.trigger(this).catch(e => this.error('Reauth trigger failed:', e.message));
       } else {
         await this.setWarning(this.homey.__('error.subscription_degraded')).catch(() => {});
         await this.setAvailable().catch(this.error);
@@ -464,6 +577,9 @@ class SleepAnalyzerDevice extends Homey.Device {
     if (this._pollTimer) this.homey.clearInterval(this._pollTimer);
     if (this._renewTimer) this.homey.clearInterval(this._renewTimer);
     if (this._durationTimer) this.homey.clearInterval(this._durationTimer);
+    for (const timer of this._chaseTimers || []) this.homey.clearTimeout(timer);
+    this._chaseTimers = [];
+
     this._pollTimer = null;
     this._renewTimer = null;
     this._durationTimer = null;

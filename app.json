@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.3.2",
+  "version": "1.5.1",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -172,6 +172,107 @@
       "setable": false,
       "uiComponent": "sensor",
       "icon": "/assets/capability-icons/wakeup.svg"
+    },
+    "withings_time_in_bed_text": {
+      "type": "string",
+      "title": {
+        "en": "Time in bed, readable",
+        "no": "Tid i sengen, lesbar"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/time-in-bed.svg"
+    },
+    "withings_time_out_of_bed_text": {
+      "type": "string",
+      "title": {
+        "en": "Time out of bed, readable",
+        "no": "Tid ute av sengen, lesbar"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/time-out-of-bed.svg"
+    },
+    "withings_last_sleep_text": {
+      "type": "string",
+      "title": {
+        "en": "Last night in bed, readable",
+        "no": "Siste natt i sengen, lesbar"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability-icons/last-night.svg"
+    },
+    "withings_sleep_score": {
+      "type": "number",
+      "title": {
+        "en": "Sleep score",
+        "no": "Søvnscore"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/last-night.svg"
+    },
+    "withings_heart_rate": {
+      "type": "number",
+      "title": {
+        "en": "Heart rate, night average",
+        "no": "Puls, snitt for natten"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "bpm",
+        "no": "slag/min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/bedtime.svg"
+    },
+    "withings_breathing_rate": {
+      "type": "number",
+      "title": {
+        "en": "Breathing rate, night average",
+        "no": "Pustefrekvens, snitt for natten"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "br/min",
+        "no": "pust/min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/wakeup.svg"
+    },
+    "withings_snoring": {
+      "type": "number",
+      "title": {
+        "en": "Snoring",
+        "no": "Snorking"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "min",
+        "no": "min"
+      },
+      "decimals": 0,
+      "min": 0,
+      "icon": "/assets/capability-icons/notifications.svg"
     }
   },
   "flow": {
@@ -217,6 +318,92 @@
             "filter": "driver_id=sleep_analyzer"
           }
         ]
+      },
+      {
+        "id": "withings_summary_ready",
+        "title": {
+          "en": "A new sleep summary is available",
+          "no": "En ny søvnoppsummering er klar"
+        },
+        "hint": {
+          "en": "Runs when Withings has finished scoring a night, which is usually a while after you get up. The tokens carry last night's numbers.",
+          "no": "Kjører når Withings er ferdig med å score en natt, som regel en stund etter at du står opp. Kortet gir deg tallene for natten."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Minutes in bed",
+              "no": "Minutter i sengen"
+            }
+          },
+          {
+            "name": "readable",
+            "type": "string",
+            "title": {
+              "en": "Time in bed",
+              "no": "Tid i sengen"
+            }
+          },
+          {
+            "name": "score",
+            "type": "number",
+            "title": {
+              "en": "Sleep score",
+              "no": "Søvnscore"
+            }
+          },
+          {
+            "name": "heart_rate",
+            "type": "number",
+            "title": {
+              "en": "Heart rate",
+              "no": "Puls"
+            }
+          },
+          {
+            "name": "breathing_rate",
+            "type": "number",
+            "title": {
+              "en": "Breathing rate",
+              "no": "Pustefrekvens"
+            }
+          },
+          {
+            "name": "snoring",
+            "type": "number",
+            "title": {
+              "en": "Snoring, minutes",
+              "no": "Snorking, minutter"
+            }
+          }
+        ]
+      },
+      {
+        "id": "withings_reauthorize_needed",
+        "title": {
+          "en": "The Withings connection needs authorizing again",
+          "no": "Withings-tilkoblingen må godkjennes på nytt"
+        },
+        "hint": {
+          "en": "Runs when Withings refuses the stored login and the device can no longer fetch data. Use it to send yourself a notification instead of finding out when a Flow does not run.",
+          "no": "Kjører når Withings avviser den lagrede innloggingen og enheten ikke lenger kan hente data. Bruk det til å varsle deg selv, i stedet for å oppdage det når en flyt ikke kjørte."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          }
+        ]
       }
     ],
     "conditions": [
@@ -231,6 +418,35 @@
             "name": "device",
             "type": "device",
             "filter": "driver_id=sleep_analyzer"
+          }
+        ]
+      },
+      {
+        "id": "withings_in_bed_longer_than",
+        "title": {
+          "en": "Time in bed !{{is|is not}} more than",
+          "no": "Tid i sengen !{{er|er ikke}} mer enn"
+        },
+        "titleFormatted": {
+          "en": "Time in bed !{{is|is not}} more than [[minutes]] min",
+          "no": "Tid i sengen !{{er|er ikke}} mer enn [[minutes]] min"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=sleep_analyzer"
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "min": 1,
+            "max": 1440,
+            "step": 1,
+            "placeholder": {
+              "en": "Minutes",
+              "no": "Minutter"
+            }
           }
         ]
       }
@@ -273,7 +489,14 @@
         "withings_time_in_bed",
         "withings_time_out_of_bed",
         "withings_last_sleep_duration",
-        "withings_subscription_ok"
+        "withings_subscription_ok",
+        "withings_time_in_bed_text",
+        "withings_time_out_of_bed_text",
+        "withings_last_sleep_text",
+        "withings_sleep_score",
+        "withings_heart_rate",
+        "withings_breathing_rate",
+        "withings_snoring"
       ],
       "capabilitiesOptions": {
         "withings_in_bed": {

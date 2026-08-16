@@ -1,6 +1,6 @@
 {
   "name": "com.thomastorp.withings-sleep",
-  "version": "1.3.2",
+  "version": "1.5.1",
   "private": true,
   "description": "Homey Pro app for the Withings Sleep Analyzer bed presence events",
   "main": "app.js",

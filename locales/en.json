@@ -49,5 +49,9 @@
   "error": {
     "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",
     "subscription_degraded": "Realtime notifications from Withings are down. Bed presence still updates, but with a delay."
+  },
+  "units": {
+    "hour": "h",
+    "minute": "min"
   }
 }

@@ -109,6 +109,15 @@ class WithingsSleepApp extends Homey.App {
         Boolean(device.getCapabilityValue('withings_in_bed')));
 
     this.homey.flow
+      .getConditionCard('withings_in_bed_longer_than')
+      .registerRunListener(({ device, minutes }) => {
+        // Only meaningful while the bed is occupied: the counter reads zero
+        // otherwise, and "out of bed for two hours" is a different question.
+        if (device.getCapabilityValue('withings_in_bed') !== true) return false;
+        return Number(device.getCapabilityValue('withings_time_in_bed')) > Number(minutes);
+      });
+
+    this.homey.flow
       .getActionCard('withings_resubscribe')
       .registerRunListener(({ device }) => device.renewSubscriptions());
   }
