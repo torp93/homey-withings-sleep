@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -643,5 +643,15 @@
         "xlarge": "/drivers/sleep_analyzer/assets/images/xlarge.png"
       }
     }
-  ]
+  ],
+  "contributing": {
+    "donate": {
+      "githubSponsors": {
+        "username": "torp93"
+      },
+      "paypal": {
+        "username": "torpthomas"
+      }
+    }
+  }
 }

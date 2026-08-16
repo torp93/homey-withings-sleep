@@ -1,4 +1,8 @@
 {
+  "1.5.2": {
+    "en": "Adds a donate button. The app is free and stays free; nothing is gated behind a payment.",
+    "no": "Legger til en donasjonsknapp. Appen er gratis og forblir gratis, ingenting er låst bak betaling."
+  },
   "1.5.1": {
     "en": "Sleep score no longer declares an empty unit, and the version bump makes Homey pick up the new fields.",
     "no": "Søvnscore oppgir ikke lenger en tom enhet, og versjonshevingen gjør at Homey plukker opp de nye feltene."
