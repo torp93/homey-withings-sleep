@@ -1,10 +1,18 @@
 <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
 
-<h2 data-i18n="settings.credentials"></h2>
+<h2 data-i18n="settings.title"></h2>
 <p data-i18n="settings.intro"></p>
 
+<pre id="status_builtin"></pre>
+
+<p>
+  <button id="test" class="homey-button-primary-full" data-i18n="settings.test"></button>
+</p>
+
 <details>
-  <summary data-i18n="settings.guide_title"></summary>
+  <summary data-i18n="settings.advanced_title"></summary>
+
+  <p data-i18n="settings.advanced_intro"></p>
 
   <p data-i18n="settings.guide_desktop"></p>
   <p><a class="ext" href="https://tools.developer.homey.app/apps">tools.developer.homey.app/apps</a></p>
@@ -39,8 +47,6 @@
 
   <h4 data-i18n="settings.guide_step3"></h4>
   <p data-i18n="settings.guide_step3_body"></p>
-</details>
-
 <fieldset>
   <legend data-i18n="settings.withings"></legend>
 
@@ -61,13 +67,10 @@
   <input id="webhookSecret" type="password" autocomplete="off" spellcheck="false" />
 </fieldset>
 
-<p>
-  <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
-</p>
-
-<p>
-  <button id="test" class="homey-button-secondary-full" data-i18n="settings.test"></button>
-</p>
+  <p>
+    <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
+  </p>
+</details>
 
 <p id="status"></p>
 <pre id="result" class="copyable"></pre>
@@ -175,6 +178,20 @@
           }
         });
       });
+    });
+
+    // A plain yes or no, fetched before anything is clicked, so an ordinary
+    // user sees at a glance that nothing is required of them. The endpoint
+    // returns a boolean; the secret itself never leaves the app.
+    Homey.api('GET', '/identity', null, () => {});
+
+    Homey.api('POST', '/testCredentials', { probeOnly: true }, (err, res) => {
+      const line = document.getElementById('status_builtin');
+      if (err || !res) return;
+
+      line.textContent = res.builtInConfigured
+        ? Homey.__('settings.builtin_ready')
+        : Homey.__('settings.builtin_missing');
     });
 
     document.getElementById('identity').addEventListener('click', () => {

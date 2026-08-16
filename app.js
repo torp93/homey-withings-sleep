@@ -16,7 +16,7 @@ class WithingsSleepApp extends Homey.App {
 
     // Names only: which accessor carries each key, never the value itself.
     const seen = Object.entries(this.envSources)
-      .map(([name, env]) => `${name}=[${CONFIG_KEYS.filter(k => env && env[k]).join(' ') || 'tom'}]`)
+      .map(([name, env]) => `${name}=[${CONFIG_KEYS.filter(k => WithingsSleepApp._envValue(env, k)).join(' ') || 'tom'}]`)
       .join(' ');
     this.log(`Environment probe: ${seen}`);
 
@@ -45,9 +45,24 @@ class WithingsSleepApp extends Homey.App {
     };
   }
 
+  /**
+   * Read a key without asking for one that is not there.
+   *
+   * The SDK logs "Trying to access Homey.env.X but the environment variable
+   * has not been set" on a plain property read, which fills the app log with
+   * warnings about optional keys. Checking first keeps the log about real
+   * problems.
+   */
+  static _envValue(env, key) {
+    if (!env || !Object.prototype.hasOwnProperty.call(env, key)) return undefined;
+    return env[key];
+  }
+
   /** Which env accessor, if any, carries a given key. */
   envSource(key) {
-    const found = Object.entries(this.envSources).find(([, env]) => env && env[key]);
+    const found = Object.entries(this.envSources)
+      .find(([, env]) => WithingsSleepApp._envValue(env, key));
+
     return found ? found[0] : null;
   }
 
@@ -66,7 +81,8 @@ class WithingsSleepApp extends Homey.App {
     if (fromSettings) return fromSettings;
 
     for (const env of Object.values(this.envSources)) {
-      if (env && env[key]) return env[key];
+      const value = WithingsSleepApp._envValue(env, key);
+      if (value) return value;
     }
 
     return undefined;

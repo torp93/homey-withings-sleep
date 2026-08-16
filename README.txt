@@ -1,31 +1,3 @@
-Bed presence from the Withings Sleep Analyzer, built to survive the failure that silently breaks bed automation.
+Let your home know when you go to bed and when you get up. The Withings Sleep Analyzer under your mattress already senses it, and this app brings that into Homey so lights, heating, alarms and anything else can follow along.
 
-Withings' notification API uses a separate subscription per data category. An app that subscribes once at pairing time and never checks again will eventually stop receiving bed events: the subscriptions for getting into and out of bed lapse, while weight data keeps flowing and the login stays valid. Everything looks healthy, but the bed triggers never fire again, and nothing reports an error.
-
-This app verifies both bed subscriptions on a timer and recreates any that have vanished. The subscription state is a capability of its own, so the failure is visible instead of silent, and a flow trigger fires if it ever happens.
-
-WHAT YOU GET
-
-- In bed / out of bed, updated in realtime
-- Bedtime and the time you got up
-- Time in bed and time out of bed, as live counters
-- Last night in bed, one value per completed night
-- Notification status, so you can see the connection is healthy
-
-FLOW CARDS
-
-- When someone gets into bed
-- When someone gets out of bed
-- When the Withings notification subscription is lost
-- And someone is / isn't in bed
-- Renew the Withings notification subscription
-
-SETUP
-
-You need a Withings account with a Sleep Analyzer set up in the Withings app. Add the device in Homey and sign in to Withings when asked. That is all.
-
-If you would rather use your own Withings application instead of the built-in one, the app settings let you enter your own keys, with a guide and a connection test.
-
-Source code and technical notes: https://github.com/torp93/homey-withings-sleep
-
-This app is not made by or affiliated with Withings.
+Add the device, sign in to your Withings account, and you are done. Alongside bed presence you get bedtime, wake-up time, time in bed, and last night's sleep score, average heart rate, average breathing rate and snoring, ready to use in Flows.

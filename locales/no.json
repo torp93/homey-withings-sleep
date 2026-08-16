@@ -6,8 +6,7 @@
     "not_authorized": "Autorisering ble ikke fullført. Prøv igjen."
   },
   "settings": {
-    "credentials": "Legitimasjon",
-    "intro": "Valgfritt. La feltene stå tomme for å bruke appens innebygde legitimasjon. Fyll dem bare ut hvis du vil bruke din egen Withings-applikasjon.",
+    "intro": "Legg til enheten og logg inn på Withings-kontoen din. Det er alt som trengs.",
     "withings": "Withings-applikasjon",
     "client_id": "Withings Client ID",
     "client_secret": "Withings Client secret",
@@ -20,7 +19,6 @@
     "testing": "Tester…",
     "test_failed": "Testen kunne ikke kjøres",
     "webhook_url_hint": "Denne Homeyens abonnements-URL. Trenger du å registrere den fulle formen hos Withings, er det denne strengen som skal limes inn:",
-    "guide_title": "Slik setter du opp din egen Withings-applikasjon",
     "guide_desktop": "Dette går fint fra telefonen, men er lettere på en PC. Lange nøkler er enklere å lime inn, og du er uansett innom Withings i nettleseren. Homeys utviklerverktøy har de samme feltene under App Settings:",
     "guide_order": "Ta stegene i denne rekkefølgen, for webhook-ID-en er en del av URL-en du registrerer hos Withings, så webhooken må lages først.",
     "guide_step1": "1. Opprett en webhook hos Homey",
@@ -44,7 +42,12 @@
     "no_source": "ingen kilde, client secret mangler",
     "env_probe": "Miljøsjekk, hvilke nøkler hver kilde faktisk leverer:",
     "renew_started": "Fornyelse startet. Se Varsling-statusen på enheten om noen sekunder.",
-    "refresh_started": "Oppdatering startet. Se statusen på enheten om noen sekunder."
+    "refresh_started": "Oppdatering startet. Se statusen på enheten om noen sekunder.",
+    "title": "Withings Sleep",
+    "builtin_ready": "✓ Appen har sin egen Withings-legitimasjon. Du trenger ikke fylle inn noe.",
+    "builtin_missing": "✗ Appen mangler legitimasjon. Legg inn din egen under Avansert.",
+    "advanced_title": "Avansert: bruk din egen Withings-applikasjon",
+    "advanced_intro": "Bare for deg som vil kjøre mot din egen Withings-applikasjon i stedet for appens. Vanlige brukere trenger ikke dette, og tomme felter betyr at appens egen legitimasjon brukes."
   },
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",

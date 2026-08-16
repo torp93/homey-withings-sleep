@@ -365,3 +365,139 @@ test('ensureSubscriptions ignores subscriptions pointing elsewhere', async () =>
   assert.deepStrictEqual(await api.ensureSubscriptions(callbackUrl), [50, 51]);
   assert.deepStrictEqual(subscribed, [50, 51]);
 });
+
+// --- Transport robustness ---------------------------------------------------
+
+const { isTransientStatus, retryAfterMs, REQUEST_TIMEOUT_MS } = require('../lib/withings-api');
+
+test('only rate limits and server faults are treated as transient', () => {
+  assert.strictEqual(isTransientStatus(429), true);
+  assert.strictEqual(isTransientStatus(500), true);
+  assert.strictEqual(isTransientStatus(503), true);
+
+  // Retrying these would ask the same question and get the same answer.
+  assert.strictEqual(isTransientStatus(400), false);
+  assert.strictEqual(isTransientStatus(401), false);
+  assert.strictEqual(isTransientStatus(403), false);
+  assert.strictEqual(isTransientStatus(200), false);
+});
+
+test('retryAfterMs reads seconds, dates and nonsense', () => {
+  const headers = value => ({ get: () => value });
+
+  assert.strictEqual(retryAfterMs(headers('2')), 2000);
+  assert.strictEqual(retryAfterMs(headers(null)), null, 'absent header');
+  assert.strictEqual(retryAfterMs(headers('later')), null, 'unparseable');
+  assert.strictEqual(retryAfterMs(headers('99999')), 60000, 'capped, not an hour of waiting');
+  assert.strictEqual(retryAfterMs(undefined), null);
+});
+
+test('a 429 is retried once the advised wait has passed, then succeeds', async () => {
+  let calls = 0;
+  const waits = [];
+
+  const fetchImpl = async () => {
+    calls += 1;
+    if (calls === 1) {
+      return { ok: false, status: 429, headers: { get: () => '3' }, json: async () => ({}) };
+    }
+    return { ok: true, status: 200, headers: { get: () => null }, json: async () => ({ status: 0, body: { nonce: 'n' } }) };
+  };
+
+  const api = new WithingsApi({
+    clientId: CLIENT_ID, clientSecret: CLIENT_SECRET, fetchImpl,
+    sleepImpl: async ms => { waits.push(ms); }
+  });
+
+  assert.strictEqual(await api.verifyCredentials(), true);
+  assert.strictEqual(calls, 2, 'retried exactly once');
+  assert.deepStrictEqual(waits, [3000], 'honoured Retry-After rather than the local backoff');
+});
+
+test('a persistent server fault gives up instead of hammering', async () => {
+  let calls = 0;
+
+  const fetchImpl = async () => {
+    calls += 1;
+    return { ok: false, status: 503, headers: { get: () => null }, json: async () => ({}) };
+  };
+
+  const api = new WithingsApi({
+    clientId: CLIENT_ID, clientSecret: CLIENT_SECRET, fetchImpl, sleepImpl: async () => {}
+  });
+
+  await assert.rejects(() => api.verifyCredentials(), err => err.status === 503);
+  assert.strictEqual(calls, 3, 'three attempts total, not an endless loop');
+});
+
+test('a request that never answers is abandoned, not left hanging', async () => {
+  // The fetch double respects the abort signal the client passes in.
+  const fetchImpl = (url, options) => new Promise((resolve, reject) => {
+    options.signal.addEventListener('abort', () => {
+      const err = new Error('aborted');
+      err.name = 'AbortError';
+      reject(err);
+    });
+  });
+
+  const api = new WithingsApi({
+    clientId: CLIENT_ID, clientSecret: CLIENT_SECRET, fetchImpl,
+    timeoutMs: 20, sleepImpl: async () => {}
+  });
+
+  await assert.rejects(() => api.verifyCredentials(), err => /timed out/.test(err.message));
+});
+
+test('the default timeout is finite', () => {
+  assert.ok(Number.isFinite(REQUEST_TIMEOUT_MS) && REQUEST_TIMEOUT_MS > 0);
+});
+
+test('a rotated refresh token replaces the old one everywhere at once', async () => {
+  const stored = [];
+  const fetchImpl = fakeFetch([
+    nonceResponse,
+    tokenResponse({ access_token: 'access-new', refresh_token: 'refresh-new' })
+  ]);
+
+  const api = new WithingsApi({
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    tokens: { accessToken: 'old', refreshToken: 'refresh-old', expiresAt: 0 },
+    onTokens: tokens => stored.push({ ...tokens }),
+    fetchImpl
+  });
+
+  await api.refresh();
+
+  // Withings invalidates the old refresh token the moment it hands out a new
+  // one. Keeping the old one anywhere means the next refresh fails and the
+  // user is asked to re-pair for no reason.
+  assert.strictEqual(api.tokens.refreshToken, 'refresh-new');
+  assert.strictEqual(stored.length, 1, 'persisted exactly once');
+  assert.strictEqual(stored[0].refreshToken, 'refresh-new', 'persisted the new one');
+  assert.strictEqual(stored[0].accessToken, 'access-new');
+});
+
+test('callers waiting on one refresh all continue with the new token', async () => {
+  const fetchImpl = fakeFetch([
+    nonceResponse,
+    tokenResponse({ access_token: 'access-shared', refresh_token: 'refresh-shared' }),
+    { path: '/notify', action: 'list', body: { status: 0, body: { profiles: [] } } }
+  ]);
+
+  const api = new WithingsApi({
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    tokens: { accessToken: 'stale', refreshToken: 'refresh-old', expiresAt: 0 },
+    fetchImpl
+  });
+
+  await Promise.all([api.listSubscriptions(50), api.listSubscriptions(51)]);
+
+  const tokenCalls = fetchImpl.calls.filter(c => c.url.includes('/v2/oauth2'));
+  assert.strictEqual(tokenCalls.length, 1, 'one refresh served both callers');
+
+  for (const call of fetchImpl.calls.filter(c => c.url.includes('/notify'))) {
+    assert.strictEqual(call.headers.Authorization, 'Bearer access-shared');
+  }
+});

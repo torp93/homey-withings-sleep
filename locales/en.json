@@ -6,8 +6,7 @@
     "not_authorized": "Authorization did not complete. Please try again."
   },
   "settings": {
-    "credentials": "Credentials",
-    "intro": "Optional. Leave blank to use the app's built-in credentials. Fill these in only if you want to use your own Withings application.",
+    "intro": "Add the device and sign in to your Withings account. That is all it takes.",
     "withings": "Withings application",
     "client_id": "Withings Client ID",
     "client_secret": "Withings Client secret",
@@ -20,7 +19,6 @@
     "testing": "Testing…",
     "test_failed": "Could not run the test",
     "webhook_url_hint": "This Homey's subscription URL. If you need to register the full form at Withings, this is the string to paste:",
-    "guide_title": "How to set up your own Withings application",
     "guide_desktop": "This works fine from the phone, but is easier on a computer. Long keys are simpler to paste, and you will be in a browser at Withings anyway. Homey's developer tools have the same fields under App Settings:",
     "guide_order": "Take the steps in this order, because the webhook id is part of the URL you register at Withings, so the webhook has to exist first.",
     "guide_step1": "1. Create a webhook at Homey",
@@ -44,7 +42,12 @@
     "no_source": "no source, client secret missing",
     "env_probe": "Environment probe, which keys each source actually delivers:",
     "renew_started": "Renewal started. Check the Notifications status on the device in a few seconds.",
-    "refresh_started": "Refresh started. Check the status on the device in a few seconds."
+    "refresh_started": "Refresh started. Check the status on the device in a few seconds.",
+    "title": "Withings Sleep",
+    "builtin_ready": "✓ The app has its own Withings credentials. Nothing is required of you.",
+    "builtin_missing": "✗ The app has no credentials. Enter your own under Advanced.",
+    "advanced_title": "Advanced: use your own Withings application",
+    "advanced_intro": "Only for running against your own Withings application instead of the app's. Ordinary users do not need this, and leaving the fields empty means the app's own credentials are used."
   },
   "error": {
     "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",

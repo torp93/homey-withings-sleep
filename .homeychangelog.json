@@ -1,4 +1,8 @@
 {
+  "1.6.0": {
+    "en": "Reliability work before certification. Every Withings request now has a timeout and backs off politely when rate limited, polls can no longer pile up on a slow network, and removing one device no longer cancels the notifications another device depends on.",
+    "no": "Robusthetsarbeid før sertifisering. Alle Withings-kall har nå tidsavbrudd og trekker seg pent tilbake ved rangering, pollinger kan ikke lenger hope seg opp på et tregt nett, og å fjerne én enhet avbryter ikke lenger varslene en annen enhet er avhengig av."
+  },
   "1.5.2": {
     "en": "Adds a donate button. The app is free and stays free; nothing is gated behind a payment.",
     "no": "Legger til en donasjonsknapp. Appen er gratis og forblir gratis, ingenting er låst bak betaling."

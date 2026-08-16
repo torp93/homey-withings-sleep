@@ -117,9 +117,11 @@ class SleepAnalyzerDevice extends Homey.Device {
       this._webhook = await this.homey.cloud.createWebhook(webhookId, webhookSecret, {});
       this._webhook.on('message', args => this._onWebhookMessage(args));
 
-      this.log(`Webhook ready: ${this._webhookUrl}`);
+      // The URL carries the webhook id and this Homey's id. Neither is a
+      // secret on its own, but the app log is not the place for either.
+      this.log(`Webhook ready for mat ${tag(this.getStoreValue('deviceId'))}.`);
     } catch (err) {
-      this.error('Webhook setup failed, polling only:', err);
+      this.error(`Webhook setup failed, polling only (${err.message}).`);
       this._webhookUrl = null;
     }
   }
@@ -504,6 +506,16 @@ class SleepAnalyzerDevice extends Homey.Device {
   }
 
   async _poll() {
+    // One in flight at a time. A slow request used to let the next interval
+    // start another, and a stalled network turned a one-minute poll into a
+    // growing pile of open calls against the same account.
+    if (this._polling) {
+      this.log('Poll skipped, the previous one is still running.');
+      return;
+    }
+
+    this._polling = true;
+
     const now = Math.floor(Date.now() / 1000);
     const window = Number(this.getSetting('bed_freshness_seconds')) || 300;
 
@@ -540,7 +552,12 @@ class SleepAnalyzerDevice extends Homey.Device {
         return;
       }
 
-      this.error('Poll failed:', err);
+      // A failed request says nothing about the bed, so the state is left
+      // exactly as it was. Status only: the message can carry a URL with
+      // identifiers in it.
+      this.error(`Poll failed (status ${err.status ?? 'none'}).`);
+    } finally {
+      this._polling = false;
     }
   }
 
@@ -633,12 +650,23 @@ class SleepAnalyzerDevice extends Homey.Device {
       await this.homey.cloud.unregisterWebhook(this._webhook).catch(this.error);
     }
 
-    // Leave Withings tidy so a re-pair starts from a clean slate.
-    if (this.webhookUrl) {
-      for (const appli of WithingsApi.BED_APPLIS) {
-        await this.api.revoke(this.webhookUrl, appli).catch(err =>
-          this.error(`Revoke appli ${appli} failed:`, err));
-      }
+    // The callback URL carries the Homey id, not the device id, so every Sleep
+    // device on this Homey subscribes with the same string. Revoking it while
+    // another device still relies on it would silently stop that device from
+    // receiving bed events, and nothing would report the cause.
+    const siblings = this.driver.getDevices().filter(device => device !== this);
+
+    if (!this.webhookUrl) return;
+
+    if (siblings.length > 0) {
+      this.log(`Leaving the Withings subscription in place: ${siblings.length} other device(s) share this callback.`);
+      return;
+    }
+
+    // Last one out. Leave Withings tidy so a re-pair starts from a clean slate.
+    for (const appli of WithingsApi.BED_APPLIS) {
+      await this.api.revoke(this.webhookUrl, appli).catch(err =>
+        this.error(`Revoke appli ${appli} failed (status ${err.status ?? 'none'}).`));
     }
   }
 }

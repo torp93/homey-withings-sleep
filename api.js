@@ -52,13 +52,18 @@ module.exports = {
         // Which env accessor carried it, or null. Names only, never values.
         env: app.envSource('WITHINGS_CLIENT_SECRET')
       },
+      // A plain yes or no for the ordinary user: are the app's own credentials
+      // in place, so nothing is asked of them? Never the value itself.
+      builtInConfigured: Boolean(
+        app.envSource('WITHINGS_CLIENT_ID') && app.envSource('WITHINGS_CLIENT_SECRET')
+      ),
       // Same probe across all four keys, so a partially delivered environment
       // is visible rather than looking like a total failure.
       envProbe: Object.fromEntries(
         Object.entries(app.envSources).map(([name, env]) => [
           name,
           ['WITHINGS_CLIENT_ID', 'WITHINGS_CLIENT_SECRET', 'WEBHOOK_ID', 'WEBHOOK_SECRET']
-            .filter(k => env && env[k])
+            .filter(k => env && Object.prototype.hasOwnProperty.call(env, k) && env[k])
         ])
       ),
       clientId: describe(clientId),
