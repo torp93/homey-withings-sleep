@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -325,8 +325,8 @@
             "no": "Pollingintervall"
           },
           "hint": {
-            "en": "Fallback polling when no webhook is configured, and the safety net that detects a lost subscription. Set to 0 to disable.",
-            "no": "Reservepolling når webhook ikke er satt opp, og sikkerhetsnettet som oppdager et mistet abonnement. Sett til 0 for å slå av."
+            "en": "How often the app asks Withings for the current bed state, 60 seconds by default. Note that Withings does not publish the live sleep series for every mat: if yours stays empty, polling cannot detect bed presence at all and the webhook is what makes the app work. Polling still corrects the state after a restart when data is available. Set to 0 to turn it off.",
+            "no": "Hvor ofte appen spør Withings om sengetilstanden, som standard hvert 60. sekund. Merk at Withings ikke publiserer den løpende søvnserien for alle matter: er din tom, kan ikke polling oppdage sengetilstedeværelse i det hele tatt, og da er webhooken det som får appen til å virke. Polling retter fortsatt tilstanden etter en omstart når det finnes data. Sett til 0 for å slå av."
           },
           "value": 60,
           "min": 0,
@@ -345,8 +345,8 @@
             "no": "Vindu for sengetilstedeværelse"
           },
           "hint": {
-            "en": "How recent the sleep data must be for the bed to count as occupied when polling.",
-            "no": "Hvor ferske søvndataene må være for at sengen skal regnes som opptatt ved polling."
+            "en": "How recent the sleep data must be for the bed to count as occupied. Withings is often a few minutes behind, so a short window can report an empty bed while you are lying in it. Leave this at 300 unless you know your mat updates faster.",
+            "no": "Hvor ferske søvndataene må være for at sengen skal regnes som opptatt. Withings ligger ofte noen minutter etter, så et kort vindu kan melde tom seng mens du ligger i den. La denne stå på 300 med mindre du vet at matta di oppdaterer raskere."
           },
           "value": 300,
           "min": 60,

@@ -1,4 +1,8 @@
 {
+  "1.2.0": {
+    "en": "Bedtime, wake-up and last night are now filled in from Withings at startup instead of staying blank until the device has lived through a whole night. Polling runs alongside the webhook, and an empty response from Withings no longer counts as an empty bed, so it cannot overwrite a correct webhook.",
+    "no": "Leggetid, oppvåkning og siste natt fylles nå fra Withings ved oppstart i stedet for å stå tomme til enheten har vært gjennom en hel natt. Polling kjører ved siden av webhooken, og et tomt svar fra Withings regnes ikke lenger som tom seng, så det kan ikke overkjøre en riktig webhook."
+  },
   "1.1.4": {
     "en": "Signing in is enough again: the app brings its own Withings credentials, and entering your own in the app settings stays optional.",
     "no": "Det holder å logge inn igjen: appen har med sin egen Withings-legitimasjon, og å legge inn din egen i appinnstillingene er fortsatt valgfritt."

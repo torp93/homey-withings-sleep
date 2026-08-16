@@ -102,9 +102,9 @@ test('deriveBedState uses the newest entry, not the last one', () => {
 test('deriveBedState handles empty and malformed input', () => {
   const now = 1700000000;
 
-  assert.strictEqual(deriveBedState([], now), false);
-  assert.strictEqual(deriveBedState(null, now), false);
-  assert.strictEqual(deriveBedState([{ enddate: 'nonsense' }], now), false);
+  assert.strictEqual(deriveBedState([], now), null, "empty means unknown, not empty bed");
+  assert.strictEqual(deriveBedState(null, now), null);
+  assert.strictEqual(deriveBedState([{ enddate: 'nonsense' }], now), null);
 });
 
 test('deriveBedState respects the boundary exactly', () => {
@@ -197,4 +197,68 @@ test('re-remembering a key moves it to the end without duplicating it', () => {
   const seen = rememberEvent('a', rememberEvent('b', rememberEvent('a', [])));
 
   assert.deepStrictEqual(seen, ['b', 'a']);
+});
+
+// --- Last night's summary ---------------------------------------------------
+
+const { summariseLastNight } = require('../lib/bed-state');
+
+test('summariseLastNight picks the newest night and converts to minutes', () => {
+  const night = summariseLastNight([
+    { startdate: 1700000000, enddate: 1700010000 },
+    { startdate: 1700100000, enddate: 1700127000 }
+  ]);
+
+  assert.strictEqual(night.startMs, 1700100000 * 1000);
+  assert.strictEqual(night.endMs, 1700127000 * 1000);
+  assert.strictEqual(night.minutes, 450, '7h30m');
+});
+
+test('summariseLastNight goes by end time, not by position in the array', () => {
+  // Withings usually returns oldest first, but a nap can land out of order.
+  const night = summariseLastNight([
+    { startdate: 1700100000, enddate: 1700127000 },
+    { startdate: 1700000000, enddate: 1700010000 }
+  ]);
+
+  assert.strictEqual(night.endMs, 1700127000 * 1000);
+});
+
+test('summariseLastNight returns null rather than inventing a zero', () => {
+  // A caller that gets null leaves the capabilities blank, which is honest.
+  assert.strictEqual(summariseLastNight([]), null);
+  assert.strictEqual(summariseLastNight(null), null);
+  assert.strictEqual(summariseLastNight([{ startdate: 1700000000 }]), null, 'no enddate');
+  assert.strictEqual(summariseLastNight([{ startdate: 5, enddate: 5 }]), null, 'zero length');
+  assert.strictEqual(summariseLastNight([{ startdate: 10, enddate: 5 }]), null, 'ends before it starts');
+});
+
+test('summariseLastNight handles a night crossing midnight', () => {
+  // 22:30 to 06:30 the next day, eight hours.
+  const start = Date.UTC(2026, 0, 1, 22, 30) / 1000;
+  const end = Date.UTC(2026, 0, 2, 6, 30) / 1000;
+
+  assert.strictEqual(summariseLastNight([{ startdate: start, enddate: end }]).minutes, 480);
+});
+
+test('summariseLastNight skips unusable entries but keeps good ones', () => {
+  const night = summariseLastNight([
+    { startdate: 1700100000, enddate: 1700103600 },
+    { startdate: 1700200000, enddate: null }
+  ]);
+
+  assert.strictEqual(night.minutes, 60);
+});
+
+test('deriveBedState says unknown, not empty, when there is no data', () => {
+  const now = 1700000000;
+
+  // The distinction that matters: a poll returning null must leave the state
+  // untouched, so it cannot overwrite a webhook that said someone is in bed.
+  assert.strictEqual(deriveBedState([], now, 300), null);
+  assert.strictEqual(deriveBedState([{ enddate: null }], now, 300), null);
+
+  // A real reading still answers plainly.
+  assert.strictEqual(deriveBedState([{ enddate: now - 60 }], now, 300), true);
+  assert.strictEqual(deriveBedState([{ enddate: now - 9999 }], now, 300), false);
 });

@@ -6,7 +6,8 @@ const {
   parseNotification,
   deriveBedState,
   shouldAcceptEvent,
-  rememberEvent
+  rememberEvent,
+  summariseLastNight
 } = require('../../lib/bed-state');
 
 /** Enough of an identifier to correlate log lines, too little to identify anyone. */
@@ -45,6 +46,7 @@ class SleepAnalyzerDevice extends Homey.Device {
     // Do not block onInit on the network; a failure here must not leave the
     // device permanently unavailable.
     this.renewSubscriptions().catch(err => this.error('Initial subscribe failed:', err));
+    this._backfillLastNight().catch(err => this.error('Backfill failed:', err));
   }
 
   /**
@@ -123,7 +125,14 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     const event = parseNotification(body);
     if (!event) {
-      this.error('Webhook payload not recognised as a bed event, ignored.');
+      // Field names only, never values: enough to tell an empty delivery from
+      // a payload we are failing to read, without logging who or which mat.
+      const shape = body && typeof body === 'object'
+        ? `keys=[${Object.keys(body).join(' ') || 'none'}]`
+        : `raw ${typeof body} length=${body ? String(body).length : 0}`;
+
+      const extras = Object.keys(args || {}).join(' ');
+      this.error(`Webhook payload not recognised as a bed event, ignored. ${shape} args=[${extras}]`);
       return;
     }
 
@@ -174,6 +183,54 @@ class SleepAnalyzerDevice extends Homey.Device {
     const seen = rememberEvent(key, this.getStoreValue('seenEvents') || []);
     await this.setStoreValue('seenEvents', seen).catch(this.error);
     await this.setStoreValue('lastEventMs', eventMs).catch(this.error);
+  }
+
+  /** Calendar day in Homey's timezone, as Withings wants it: YYYY-MM-DD. */
+  _ymd(epochMs) {
+    return new Date(epochMs).toLocaleDateString('en-CA', {
+      timeZone: this.homey.clock.getTimezone()
+    });
+  }
+
+  /**
+   * Fill bedtime, wake-up and last-night duration from Withings' own scoring.
+   *
+   * Without this the three capabilities stay blank until the device has lived
+   * through a whole night, because they are otherwise only written when this
+   * process observes the events itself. A freshly paired device therefore
+   * looked broken even though nothing was wrong.
+   *
+   * Deliberately does not touch withings_in_bed and fires no Flows: this is
+   * history being displayed, not a transition happening now.
+   */
+  async _backfillLastNight() {
+    const now = Date.now();
+    const from = this._ymd(now - 2 * 24 * 3600 * 1000);
+    const to = this._ymd(now);
+
+    const series = await this.api.getSleepSummary(from, to);
+    const night = summariseLastNight(series);
+
+    if (!night) {
+      this.log('Backfill: Withings has no completed night to report yet.');
+      return;
+    }
+
+    // Never overwrite a value this session already learned from a live event;
+    // that one is newer than anything a summary can offer.
+    if (!this.getCapabilityValue('withings_bedtime')) {
+      await this.setCapabilityValue('withings_bedtime', this._formatClock(night.startMs)).catch(this.error);
+    }
+
+    if (!this.getCapabilityValue('withings_wakeup_time')) {
+      await this.setCapabilityValue('withings_wakeup_time', this._formatClock(night.endMs)).catch(this.error);
+    }
+
+    if (!this.getCapabilityValue('withings_last_sleep_duration')) {
+      await this.setCapabilityValue('withings_last_sleep_duration', night.minutes).catch(this.error);
+    }
+
+    this.log(`Backfill: last night was ${night.minutes} min, ${this._formatClock(night.startMs)} to ${this._formatClock(night.endMs)}.`);
   }
 
   /** Local wall-clock time, in Homey's own timezone. */
@@ -326,7 +383,18 @@ class SleepAnalyzerDevice extends Homey.Device {
       const silent = !this._reconciled;
       this._reconciled = true;
 
-      await this._setBedState(deriveBedState(series, now, window), Date.now(), { silent });
+      const inBed = deriveBedState(series, now, window);
+
+      // The one line that shows whether polling sees anything at all: without
+      // it a silent webhook and an empty sleep series look identical.
+      const verdict = inBed === null ? 'no data, state left as is' : `bed ${inBed ? 'occupied' : 'empty'}`;
+      this.log(`Poll: ${series.length} series entr${series.length === 1 ? 'y' : 'ies'} in the last ${window * 2}s, ${verdict}.`);
+
+      // Only a definite reading may move the state. An absent series says
+      // nothing about the bed, and the webhook may know better.
+      if (inBed !== null) {
+        await this._setBedState(inBed, Date.now(), { silent });
+      }
       await this.setAvailable().catch(this.error);
     } catch (err) {
       // A token issued before user.activity was requested cannot read the
@@ -346,12 +414,17 @@ class SleepAnalyzerDevice extends Homey.Device {
   _startTimers() {
     this._stopTimers();
 
-    // Polling exists only for installations without a webhook. When the
-    // webhook is live it is the authoritative source, and polling would add
-    // API calls and latency for nothing.
+    // Polling runs alongside the webhook, not instead of it.
+    //
+    // A configured webhook is not the same as a delivering one: subscriptions
+    // can be active at Withings while callbacks carry nothing, and then a
+    // webhook-only device sits frozen with no way to notice. Both paths feed
+    // the same state, and the transition guard means whichever arrives second
+    // changes nothing, so the cost is API calls rather than duplicate Flows.
     const pollSeconds = Number(this.getSetting('poll_interval_seconds')) || 0;
-    if (pollSeconds > 0 && !this.webhookUrl) {
+    if (pollSeconds > 0) {
       this._pollTimer = this.homey.setInterval(() => this._poll(), pollSeconds * 1000);
+      this.log(`Polling every ${pollSeconds}s${this.webhookUrl ? ' as a safety net behind the webhook' : ''}.`);
     }
 
     const renewHours = Number(this.getSetting('resubscribe_hours')) || 6;
