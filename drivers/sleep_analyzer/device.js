@@ -328,6 +328,10 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     await this.setCapabilityValue('withings_time_in_bed', inBed ? minutes : 0).catch(this.error);
     await this.setCapabilityValue('withings_time_out_of_bed', inBed ? 0 : minutes).catch(this.error);
+
+    // Counters that stop moving look identical to counters that were never
+    // running. One line per minute makes the difference visible in the log.
+    this.log(`Durations: ${inBed ? 'in bed' : 'out of bed'} for ${minutes} min.`);
   }
 
   /**

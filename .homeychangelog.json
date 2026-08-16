@@ -1,4 +1,8 @@
 {
+  "1.3.2": {
+    "en": "The duration counters now write a line to the app log each minute, so a counter that has stopped can be told from one that was never running.",
+    "no": "Varighetstellerne skriver nå en linje i apploggen hvert minutt, så en teller som har stoppet kan skilles fra en som aldri kjørte."
+  },
   "1.3.1": {
     "en": "No credentials of the app author are shipped any more: every installation enters its own in the app settings. Also corrects where the settings page is found.",
     "no": "Ingen av apputviklerens legitimasjon følger lenger med: hver installasjon legger inn sin egen i appinnstillingene. Retter også hvor innstillingssiden finnes."
