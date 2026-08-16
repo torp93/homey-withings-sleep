@@ -231,6 +231,22 @@ class SleepAnalyzerDevice extends Homey.Device {
     }
 
     this.log(`Backfill: last night was ${night.minutes} min, ${this._formatClock(night.startMs)} to ${this._formatClock(night.endMs)}.`);
+
+    // A completed session that ended after the state last changed means the
+    // bed-out happened while nobody was listening: a power cut, an outage, or
+    // a webhook that never arrived. Withings has since scored the night, so it
+    // is safe to trust. Corrected silently, because the transition is history
+    // and replaying it as live would run automations hours late.
+    const since = Number(this.getStoreValue('stateSince')) || 0;
+
+    if (this.getCapabilityValue('withings_in_bed') === true && night.endMs > since) {
+      this.log('Backfill: Withings has scored a completed night since the last change, correcting to out of bed.');
+      await this._setBedState(false, night.endMs, { silent: true });
+
+      if (!this.getCapabilityValue('withings_wakeup_time')) {
+        await this.setCapabilityValue('withings_wakeup_time', this._formatClock(night.endMs)).catch(this.error);
+      }
+    }
   }
 
   /** Local wall-clock time, in Homey's own timezone. */
@@ -457,6 +473,18 @@ class SleepAnalyzerDevice extends Homey.Device {
     // Homey's settings schema has no button type, so the renewal is a checkbox
     // that acts on save and clears itself. The reset has to happen after this
     // handler returns, or Homey overwrites it with the values being saved.
+    if (changedKeys.includes('refresh_now') && newSettings.refresh_now === true) {
+      this.homey.setTimeout(async () => {
+        await this.setSettings({ refresh_now: false }).catch(this.error);
+
+        this.log('Manual refresh requested from device settings.');
+        await this._backfillLastNight().catch(err => this.error('Manual backfill failed:', err));
+        await this._poll().catch(err => this.error('Manual poll failed:', err));
+      }, 1000);
+
+      return this.homey.__('settings.refresh_started');
+    }
+
     if (changedKeys.includes('renew_now') && newSettings.renew_now === true) {
       this.homey.setTimeout(async () => {
         await this.setSettings({ renew_now: false }).catch(this.error);

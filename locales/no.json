@@ -43,7 +43,8 @@
     "guide_step2_full": "Hver installasjon abonnerer med sin egen Homey-ID lagt til. Basis-URL-en over dekker dem alle, så denne trenger du normalt ikke registrere:",
     "no_source": "ingen kilde, client secret mangler",
     "env_probe": "Miljøsjekk, hvilke nøkler hver kilde faktisk leverer:",
-    "renew_started": "Fornyelse startet. Se Varsling-statusen på enheten om noen sekunder."
+    "renew_started": "Fornyelse startet. Se Varsling-statusen på enheten om noen sekunder.",
+    "refresh_started": "Oppdatering startet. Se statusen på enheten om noen sekunder."
   },
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",
