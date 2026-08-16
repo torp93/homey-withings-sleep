@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -325,8 +325,8 @@
             "no": "Pollingintervall"
           },
           "hint": {
-            "en": "How often the app asks Withings for the current bed state, 60 seconds by default. Withings does not publish a live sleep series for every mat: if yours stays empty, polling cannot detect bed presence at all, and the webhook is what makes the app work. Set one up under Settings, Apps, Withings Sleep, where the guide walks through it. Set to 0 to turn polling off.",
-            "no": "Hvor ofte appen spør Withings om sengetilstanden, som standard hvert 60. sekund. Withings publiserer ikke en løpende søvnserie for alle matter: er din tom, kan ikke polling oppdage sengetilstedeværelse i det hele tatt, og da er webhooken det som får appen til å virke. Den settes opp under Innstillinger, Apper, Withings Sleep, der veiledningen tar deg gjennom det. Sett til 0 for å slå av polling."
+            "en": "How often the app asks Withings for the current bed state, 60 seconds by default. Withings does not publish a live sleep series for every mat: if yours stays empty, polling cannot detect bed presence at all, and the webhook is what makes the app work. Set one up under Settings, Show app, Settings, App settings, where the guide walks through it. Set to 0 to turn polling off.",
+            "no": "Hvor ofte appen spør Withings om sengetilstanden, som standard hvert 60. sekund. Withings publiserer ikke en løpende søvnserie for alle matter: er din tom, kan ikke polling oppdage sengetilstedeværelse i det hele tatt, og da er webhooken det som får appen til å virke. Den settes opp under Innstillinger, Vis app, Innstillinger, Appinnstillinger, der veiledningen tar deg gjennom det. Sett til 0 for å slå av polling."
           },
           "value": 60,
           "min": 0,

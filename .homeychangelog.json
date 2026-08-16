@@ -1,4 +1,8 @@
 {
+  "1.3.1": {
+    "en": "No credentials of the app author are shipped any more: every installation enters its own in the app settings. Also corrects where the settings page is found.",
+    "no": "Ingen av apputviklerens legitimasjon følger lenger med: hver installasjon legger inn sin egen i appinnstillingene. Retter også hvor innstillingssiden finnes."
+  },
   "1.3.0": {
     "en": "Device settings gain a manual refresh that asks Withings for the latest completed night, and corrects the bed state if an event was missed, for instance after a power cut.",
     "no": "Enhetsinnstillingene har fått en manuell oppdatering som spør Withings om siste fullførte natt, og retter sengetilstanden hvis en hendelse har gått tapt, for eksempel etter strømbrudd."
