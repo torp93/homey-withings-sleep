@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -255,24 +255,6 @@
       "decimals": 0,
       "min": 0,
       "icon": "/assets/capability-icons/wakeup.svg"
-    },
-    "withings_snoring": {
-      "type": "number",
-      "title": {
-        "en": "Snoring",
-        "no": "Snorking"
-      },
-      "getable": true,
-      "setable": false,
-      "insights": true,
-      "uiComponent": "sensor",
-      "units": {
-        "en": "min",
-        "no": "min"
-      },
-      "decimals": 0,
-      "min": 0,
-      "icon": "/assets/capability-icons/notifications.svg"
     }
   },
   "flow": {
@@ -375,14 +357,6 @@
             "title": {
               "en": "Breathing rate",
               "no": "Pustefrekvens"
-            }
-          },
-          {
-            "name": "snoring",
-            "type": "number",
-            "title": {
-              "en": "Snoring, minutes",
-              "no": "Snorking, minutter"
             }
           }
         ]
@@ -495,8 +469,7 @@
         "withings_last_sleep_text",
         "withings_sleep_score",
         "withings_heart_rate",
-        "withings_breathing_rate",
-        "withings_snoring"
+        "withings_breathing_rate"
       ],
       "capabilitiesOptions": {
         "withings_in_bed": {

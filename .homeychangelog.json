@@ -1,4 +1,8 @@
 {
+  "1.6.1": {
+    "en": "Removes the snoring field. Withings reports zero for mats that do not measure snoring, which read as a night without snoring rather than a measurement that was never taken.",
+    "no": "Fjerner snorkefeltet. Withings rapporterer null for matter som ikke måler snorking, og det leses som en natt uten snorking i stedet for en måling som aldri ble gjort."
+  },
   "1.6.0": {
     "en": "Reliability work before certification. Every Withings request now has a timeout and backs off politely when rate limited, polls can no longer pile up on a slow network, and removing one device no longer cancels the notifications another device depends on.",
     "no": "Robusthetsarbeid før sertifisering. Alle Withings-kall har nå tidsavbrudd og trekker seg pent tilbake ved rangering, pollinger kan ikke lenger hope seg opp på et tregt nett, og å fjerne én enhet avbryter ikke lenger varslene en annen enhet er avhengig av."

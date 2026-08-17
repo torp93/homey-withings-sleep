@@ -68,9 +68,23 @@ class SleepAnalyzerDevice extends Homey.Device {
       'withings_last_sleep_text',
       'withings_sleep_score',
       'withings_heart_rate',
-      'withings_breathing_rate',
-      'withings_snoring'
+      'withings_breathing_rate'
     ];
+
+    // Capabilities dropped from the app stay on devices that already have
+    // them, showing an empty tile forever. Remove them explicitly.
+    const retired = ['withings_snoring'];
+
+    for (const capability of retired) {
+      if (!this.hasCapability(capability)) continue;
+
+      try {
+        await this.removeCapability(capability);
+        this.log(`Removed retired capability ${capability}`);
+      } catch (err) {
+        this.error(`Could not remove ${capability}:`, err.message);
+      }
+    }
 
     for (const capability of wanted) {
       if (this.hasCapability(capability)) continue;
@@ -207,8 +221,7 @@ class SleepAnalyzerDevice extends Homey.Device {
     const map = {
       withings_sleep_score: metrics && metrics.sleepScore,
       withings_heart_rate: metrics && metrics.heartRate,
-      withings_breathing_rate: metrics && metrics.breathingRate,
-      withings_snoring: metrics && metrics.snoringMinutes
+      withings_breathing_rate: metrics && metrics.breathingRate
     };
 
     const written = [];
@@ -331,8 +344,7 @@ class SleepAnalyzerDevice extends Homey.Device {
         readable: formatDuration(night.minutes, this._durationUnits) || '',
         score: m.sleepScore ?? 0,
         heart_rate: m.heartRate ?? 0,
-        breathing_rate: m.breathingRate ?? 0,
-        snoring: m.snoringMinutes ?? 0
+        breathing_rate: m.breathingRate ?? 0
       }).catch(err => this.error('Summary trigger failed:', err.message));
     }
 

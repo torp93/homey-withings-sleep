@@ -301,13 +301,21 @@ test('formatDuration returns null for nothing to show, not a fake zero', () => {
 
 const { readMetrics } = require('../lib/bed-state');
 
-test('readMetrics converts snoring to minutes and passes the rest through', () => {
-  const m = readMetrics({ sleep_score: 78, hr_average: 54, rr_average: 14, snoring: 1380 });
+test('readMetrics passes through what Withings measured', () => {
+  const m = readMetrics({ sleep_score: 78, hr_average: 54, rr_average: 14 });
 
   assert.strictEqual(m.sleepScore, 78);
   assert.strictEqual(m.heartRate, 54);
   assert.strictEqual(m.breathingRate, 14);
-  assert.strictEqual(m.snoringMinutes, 23, '1380 seconds');
+});
+
+test('readMetrics ignores snoring, which was removed in 1.6.1', () => {
+  // Withings answers 0 for mats without snoring detection instead of leaving
+  // the field out, so it could not be told apart from a quiet night.
+  const m = readMetrics({ sleep_score: 78, snoring: 1380 });
+
+  assert.strictEqual(m.snoringMinutes, undefined);
+  assert.ok(!('snoring' in m));
 });
 
 test('readMetrics keeps missing measurements missing', () => {
@@ -318,22 +326,22 @@ test('readMetrics keeps missing measurements missing', () => {
   assert.strictEqual(m.sleepScore, 80);
   assert.strictEqual(m.heartRate, null);
   assert.strictEqual(m.breathingRate, null);
-  assert.strictEqual(m.snoringMinutes, null);
 });
 
 test('readMetrics survives a summary with no data at all', () => {
   const m = readMetrics(undefined);
 
   assert.deepStrictEqual(m, {
-    sleepScore: null, heartRate: null, breathingRate: null, snoringMinutes: null
+    sleepScore: null, heartRate: null, breathingRate: null
   });
 });
 
 test('readMetrics ignores values that are not numbers', () => {
-  const m = readMetrics({ sleep_score: 'n/a', snoring: null });
+  const m = readMetrics({ sleep_score: 'n/a', hr_average: null, rr_average: '' });
 
   assert.strictEqual(m.sleepScore, null);
-  assert.strictEqual(m.snoringMinutes, null);
+  assert.strictEqual(m.heartRate, null);
+  assert.strictEqual(m.breathingRate, null);
 });
 
 test('summariseLastNight carries the metrics of the night it picked', () => {
