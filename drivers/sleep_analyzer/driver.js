@@ -48,15 +48,25 @@ class SleepAnalyzerDriver extends Homey.Driver {
 
           if (existing && String(tokens.userId) !== existing) {
             this.error('Repair aborted: a different Withings account was authorized.');
-            await session.emit('error', this.homey.__('repair.wrong_account'));
+            await session.emit('error', this.homey.__('repair.wrong_account')).catch(() => {});
             return;
           }
 
           await device.applyTokens(tokens);
-          await session.emit('authorized', null);
         } catch (err) {
           this.error(`Repair token exchange failed (status ${err.status ?? 'none'}).`);
-          await session.emit('error', this.homey.__('repair.failed'));
+          await session.emit('error', this.homey.__('repair.failed')).catch(() => {});
+          return;
+        }
+
+        // The tokens are in place from here on, so the repair has succeeded
+        // whatever the view does next. Telling it can fail if the session has
+        // already gone away, and reporting that as a failed repair would send
+        // the user round again for nothing.
+        try {
+          await session.emit('authorized', null);
+        } catch (err) {
+          this.log(`Repair finished, but the view had already closed (${err.message}).`);
         }
       });
 
