@@ -98,6 +98,27 @@ class SleepAnalyzerDevice extends Homey.Device {
     }
   }
 
+  /**
+   * Adopt tokens from a repair, and start using them immediately.
+   *
+   * Persisting alone is not enough: the running API client holds its own copy,
+   * so without this the device would keep failing with the old token until the
+   * next restart, and the repair would look like it had not worked.
+   */
+  async applyTokens(tokens) {
+    await this._persistTokens(tokens);
+    this.api.tokens = { ...tokens };
+
+    this.log('Repaired: new Withings tokens in use.');
+
+    await this.setAvailable().catch(this.error);
+    await this._warn(null);
+
+    // Prove the new tokens work, and put the subscriptions back if the lapse
+    // outlived them.
+    this.renewSubscriptions().catch(err => this.error('Post-repair subscribe failed:', err.message));
+  }
+
   async _persistTokens(tokens) {
     try {
       for (const [key, value] of Object.entries(tokens)) {

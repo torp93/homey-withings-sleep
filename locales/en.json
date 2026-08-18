@@ -56,5 +56,12 @@
   "units": {
     "hour": "h",
     "minute": "min"
+  },
+  "repair": {
+    "title": "Reconnect to Withings",
+    "instructions": "A Withings login window will open. Sign in with the same account the device was added with, and grant access again.",
+    "done": "The connection has been renewed.",
+    "wrong_account": "That was a different Withings account than the device was added with. Sign in with the same account, or add a new device for the other account.",
+    "failed": "Sign-in did not complete. Please try again."
   }
 }

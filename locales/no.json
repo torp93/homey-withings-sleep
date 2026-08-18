@@ -56,5 +56,12 @@
   "units": {
     "hour": "t",
     "minute": "min"
+  },
+  "repair": {
+    "title": "Koble til Withings på nytt",
+    "instructions": "Et Withings-innloggingsvindu åpnes. Logg inn med samme konto som enheten ble lagt til med, og gi tilgang på nytt.",
+    "done": "Tilkoblingen er fornyet.",
+    "wrong_account": "Det var en annen Withings-konto enn den enheten ble lagt til med. Logg inn med samme konto, eller legg til en ny enhet for den andre kontoen.",
+    "failed": "Innloggingen ble ikke fullført. Prøv igjen."
   }
 }

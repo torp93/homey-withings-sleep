@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -614,7 +614,12 @@
         "small": "/drivers/sleep_analyzer/assets/images/small.png",
         "large": "/drivers/sleep_analyzer/assets/images/large.png",
         "xlarge": "/drivers/sleep_analyzer/assets/images/xlarge.png"
-      }
+      },
+      "repair": [
+        {
+          "id": "repair"
+        }
+      ]
     }
   ],
   "contributing": {

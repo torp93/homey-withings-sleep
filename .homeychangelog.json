@@ -1,4 +1,8 @@
 {
+  "1.7.0": {
+    "en": "Adds Repair. If the Withings connection stops being accepted, repair the device to sign in again instead of removing and adding it, which keeps its Flows, history and settings.",
+    "no": "Legger til Reparer. Slutter Withings-tilkoblingen å bli godtatt, reparerer du enheten og logger inn på nytt i stedet for å fjerne og legge den til, slik at flyter, historikk og innstillinger beholdes."
+  },
   "1.6.1": {
     "en": "Removes the snoring field. Withings reports zero for mats that do not measure snoring, which read as a night without snoring rather than a measurement that was never taken.",
     "no": "Fjerner snorkefeltet. Withings rapporterer null for matter som ikke måler snorking, og det leses som en natt uten snorking i stedet for en måling som aldri ble gjort."

@@ -1,0 +1,16 @@
+<script type="application/javascript">
+  Homey.setTitle(Homey.__('repair.title'));
+
+  // Same OAuth popup as pairing. The difference is the ending: repair updates
+  // the tokens on the device that is already there, so there is no device list
+  // and no second device to add.
+  Homey.on('url', url => Homey.popup(url));
+
+  Homey.on('authorized', () => {
+    Homey.alert(Homey.__('repair.done'), 'info', () => Homey.done());
+  });
+
+  Homey.on('error', message => Homey.alert(message, 'error'));
+</script>
+
+<p data-i18n="repair.instructions"></p>
