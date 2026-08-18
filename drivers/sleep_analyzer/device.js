@@ -119,6 +119,26 @@ class SleepAnalyzerDevice extends Homey.Device {
     this.renewSubscriptions().catch(err => this.error('Post-repair subscribe failed:', err.message));
   }
 
+  /**
+   * Set or clear the device warning without assuming the method exists.
+   *
+   * setWarning and unsetWarning are not on every Homey firmware, and calling a
+   * missing method throws synchronously, before any .catch() can attach. That
+   * is exactly how a successful repair came to report itself as failed.
+   *
+   * @param {?string} message Null clears the warning.
+   */
+  async _warn(message) {
+    const method = message ? 'setWarning' : 'unsetWarning';
+    if (typeof this[method] !== 'function') return;
+
+    try {
+      await (message ? this.setWarning(message) : this.unsetWarning());
+    } catch (err) {
+      this.error(`${method} failed:`, err.message);
+    }
+  }
+
   async _persistTokens(tokens) {
     try {
       for (const [key, value] of Object.entries(tokens)) {
@@ -503,7 +523,7 @@ class SleepAnalyzerDevice extends Homey.Device {
       }
 
       await this.setCapabilityValue('withings_subscription_ok', true).catch(this.error);
-      await this.unsetWarning().catch(() => {});
+      await this._warn(null);
       await this.setAvailable().catch(this.error);
 
       if (created.length > 0) {
@@ -530,7 +550,7 @@ class SleepAnalyzerDevice extends Homey.Device {
         await this.setUnavailable(this.homey.__('error.reauthorize')).catch(this.error);
         this.driver.reauthorizeTrigger.trigger(this).catch(e => this.error('Reauth trigger failed:', e.message));
       } else {
-        await this.setWarning(this.homey.__('error.subscription_degraded')).catch(() => {});
+        await this._warn(this.homey.__('error.subscription_degraded'));
         await this.setAvailable().catch(this.error);
       }
 

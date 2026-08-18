@@ -38,8 +38,10 @@ class SleepAnalyzerDriver extends Homey.Driver {
       .on('url', url => session.emit('url', url))
       .on('code', async code => {
         try {
+          this.log('Repair: authorization code received, exchanging it.');
           const api = new WithingsApi({ clientId, clientSecret, redirectUri });
           const tokens = await api.exchangeCode(code);
+          this.log(`Repair: exchange succeeded for user ${String(tokens.userId).slice(-4)}.`);
 
           // Signing in as somebody else would leave the device listening for a
           // user it can no longer match, and its bed events would be filtered
@@ -54,7 +56,9 @@ class SleepAnalyzerDriver extends Homey.Driver {
 
           await device.applyTokens(tokens);
         } catch (err) {
-          this.error(`Repair token exchange failed (status ${err.status ?? 'none'}).`);
+          // Status alone said "none" and told us nothing. The message carries
+          // Withings' own wording, which is what identifies the cause.
+          this.error(`Repair failed at ${err.step || 'token exchange'}: status ${err.status ?? 'none'}, ${err.message}`);
           await session.emit('error', this.homey.__('repair.failed')).catch(() => {});
           return;
         }
