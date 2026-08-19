@@ -181,7 +181,7 @@ Homey Pro instead and needs no Docker.
 
 ## Publishing
 
-The app is at 1.0.0 and passes `homey app validate --level publish`.
+The app is at 1.7.6 and passes `homey app validate --level publish`.
 
 ```bash
 npm test
@@ -193,10 +193,8 @@ homey app publish
 Athom's review. The version in `app.json` must be bumped for every submission,
 and every version needs a matching entry in `.homeychangelog.json`.
 
-Two things are still open before submitting:
+One thing is still open before a broad release:
 
-- **Artwork.** The app and driver images are a Withings product photograph,
-  used with no licence from Withings. Athom reviews artwork.
-- **Brand name.** The app is called "Withings Sleep" and uses Withings' brand
-  colour. Athom's guidelines restrict using a manufacturer's name and marks
-  without permission; the store listing may need renaming.
+- **Withings API mode.** The Withings application backing the app is in
+  development mode, which caps it at ten linked users. Lifting that requires
+  the callback URL to satisfy Withings' rules for a production application.
