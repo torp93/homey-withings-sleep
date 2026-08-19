@@ -1,19 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" fill="none">
-  <g stroke="#000" stroke-linecap="round" stroke-linejoin="round">
-    <g transform="rotate(-20 480 486)">
-      <path d="M100 486H20" stroke-width="30"/>
-      <rect x="100" y="336" width="800" height="300" rx="60" stroke-width="30"/>
-      <rect x="128" y="364" width="744" height="244" rx="36" stroke-width="16"/>
-    <path d="M250 400V572" stroke-width="16"/>
-    <path d="M308 400V572" stroke-width="16"/>
-    <path d="M366 400V572" stroke-width="16"/>
-    <path d="M424 400V572" stroke-width="16"/>
-    <path d="M482 400V572" stroke-width="16"/>
-    <path d="M540 400V572" stroke-width="16"/>
-    <path d="M598 400V572" stroke-width="16"/>
-    <path d="M656 400V572" stroke-width="16"/>
-    <path d="M714 400V572" stroke-width="16"/>
-    <path d="M772 400V572" stroke-width="16"/>
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960">
+  <title>Sleep Analyzer</title>
+  <!--
+    Filled paths only. Homey renders driver icons as a mask on iOS, which
+    discards strokes and fills every subpath, so an outline drawing turns
+    into a solid slab there. The frame is a single path whose inner
+    contour is wound the opposite way, so it stays a hole under both
+    nonzero and evenodd fill rules.
+  -->
+  <g transform="rotate(-20 480 486)">
+    <path fill="#000" fill-rule="evenodd" d="M20 471H100A15 15 0 0 1 115 486V486A15 15 0 0 1 100 501H20A15 15 0 0 1 5 486V486A15 15 0 0 1 20 471ZM160 321H840A75 75 0 0 1 915 396V576A75 75 0 0 1 840 651H160A75 75 0 0 1 85 576V396A75 75 0 0 1 160 321ZM166 357A45 45 0 0 0 121 402V570A45 45 0 0 0 166 615H834A45 45 0 0 0 879 570V402A45 45 0 0 0 834 357ZM250 398H250A9 9 0 0 1 259 407V565A9 9 0 0 1 250 574H250A9 9 0 0 1 241 565V407A9 9 0 0 1 250 398ZM314 398H314A9 9 0 0 1 323 407V565A9 9 0 0 1 314 574H314A9 9 0 0 1 305 565V407A9 9 0 0 1 314 398ZM378 398H378A9 9 0 0 1 387 407V565A9 9 0 0 1 378 574H378A9 9 0 0 1 369 565V407A9 9 0 0 1 378 398ZM442 398H442A9 9 0 0 1 451 407V565A9 9 0 0 1 442 574H442A9 9 0 0 1 433 565V407A9 9 0 0 1 442 398ZM506 398H506A9 9 0 0 1 515 407V565A9 9 0 0 1 506 574H506A9 9 0 0 1 497 565V407A9 9 0 0 1 506 398ZM570 398H570A9 9 0 0 1 579 407V565A9 9 0 0 1 570 574H570A9 9 0 0 1 561 565V407A9 9 0 0 1 570 398ZM634 398H634A9 9 0 0 1 643 407V565A9 9 0 0 1 634 574H634A9 9 0 0 1 625 565V407A9 9 0 0 1 634 398ZM698 398H698A9 9 0 0 1 707 407V565A9 9 0 0 1 698 574H698A9 9 0 0 1 689 565V407A9 9 0 0 1 698 398ZM762 398H762A9 9 0 0 1 771 407V565A9 9 0 0 1 762 574H762A9 9 0 0 1 753 565V407A9 9 0 0 1 762 398Z"/>
   </g>
 </svg>

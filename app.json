@@ -1,6 +1,6 @@
 {
   "id": "com.thomastorp.withings-sleep",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
