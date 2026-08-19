@@ -1,4 +1,8 @@
 {
+  "1.7.1": {
+    "en": "New app image showing the Sleep Analyzer in a bedroom, and a device icon that depicts the mat itself rather than a bed.",
+    "no": "Nytt appbilde som viser Sleep Analyzer i et soverom, og et enhetsikon som viser selve matten i stedet for en seng."
+  },
   "1.7.0": {
     "en": "Adds Repair. If the Withings connection stops being accepted, repair the device to sign in again instead of removing and adding it, which keeps its Flows, history and settings.",
     "no": "Legger til Reparer. Slutter Withings-tilkoblingen å bli godtatt, reparerer du enheten og logger inn på nytt i stedet for å fjerne og legge den til, slik at flyter, historikk og innstillinger beholdes."
