@@ -1,15 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
-  <title>Sleep Analyzer</title>
-  <!--
-    The mat itself, not a bed: this is the driver icon and has to read as the
-    device. A wide rounded pad with two quilted seams and the cable leaving one
-    end. Stroke weight matches the capability icons so the set looks related,
-    and everything stays well inside the canvas so nothing clips at small
-    sizes.
-  -->
-  <g fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="95" y="175" width="360" height="150" rx="40"/>
-    <path d="M255 195v110M345 195v110"/>
-    <path d="M95 250H60a35 35 0 0 0-35 35v40"/>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="960"
+     height="960"
+     viewBox="0 0 960 960"
+     fill="none">
+  <g stroke="#000"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     transform="translate(0 40)">
+    <!-- Power cable, drawn behind the mat. -->
+    <path d="M143 567C101 571 71 584 49 604C29 622 20 649 22 681"
+          stroke-width="30"/>
+
+    <!-- Sleep mat, angled to remain recognisable at small sizes. -->
+    <g transform="rotate(-20 490 440)">
+      <rect x="120" y="260" width="740" height="360" rx="52"
+            stroke-width="30"/>
+      <rect x="148" y="288" width="684" height="304" rx="32"
+            stroke-width="16"/>
+
+      <!-- Air-channel seams. -->
+      <path d="M220 304C212 378 212 502 220 576"
+            stroke-width="16"/>
+      <path d="M290 304C284 383 284 497 290 576"
+            stroke-width="16"/>
+      <path d="M360 304C355 387 355 493 360 576"
+            stroke-width="16"/>
+      <path d="M430 304C427 390 427 490 430 576"
+            stroke-width="16"/>
+      <path d="M500 304V576"
+            stroke-width="16"/>
+      <path d="M570 304C573 390 573 490 570 576"
+            stroke-width="16"/>
+      <path d="M640 304C645 387 645 493 640 576"
+            stroke-width="16"/>
+      <path d="M710 304C716 383 716 497 710 576"
+            stroke-width="16"/>
+      <path d="M780 304C788 378 788 502 780 576"
+            stroke-width="16"/>
+    </g>
   </g>
 </svg>
