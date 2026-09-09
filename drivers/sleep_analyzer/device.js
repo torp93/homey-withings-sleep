@@ -18,6 +18,20 @@ function tag(value) {
   return s.length <= 4 ? '…' : `…${s.slice(-4)}`;
 }
 
+/**
+ * Field names and sizes only, never values: a webhook payload carries a
+ * Withings user id and mat id. Enough to tell an empty delivery apart from one
+ * whose fields we are failing to read.
+ */
+function describePayload(payload) {
+  if (payload === undefined) return 'absent';
+  if (payload === null) return 'null';
+  if (typeof payload !== 'object') return `raw ${typeof payload} length=${String(payload).length}`;
+
+  const keys = Object.keys(payload);
+  return keys.length ? `keys=[${keys.join(' ')}]` : 'empty';
+}
+
 class SleepAnalyzerDevice extends Homey.Device {
   async onInit() {
     this.userId = this.getStore().userId || this.getData().id;
@@ -182,22 +196,26 @@ class SleepAnalyzerDevice extends Homey.Device {
   }
 
   _onWebhookMessage(args) {
-    const { body, headers } = args || {};
+    const { body, headers, query } = args || {};
 
     // Shape only. The payload carries a Withings user id and device id, so it
     // is never logged verbatim.
     this.log(`Webhook hit, body is ${typeof body}, content-type ${(headers && headers['content-type']) || 'unset'}`);
 
-    const event = parseNotification(body);
+    // A diagnostics report from the field showed deliveries arriving with an
+    // empty body, so the fields have to be somewhere else in the envelope.
+    // Read the query too rather than dropping a real bed event.
+    const event = parseNotification(body) || parseNotification(query);
     if (!event) {
       // Field names only, never values: enough to tell an empty delivery from
       // a payload we are failing to read, without logging who or which mat.
-      const shape = body && typeof body === 'object'
-        ? `keys=[${Object.keys(body).join(' ') || 'none'}]`
-        : `raw ${typeof body} length=${body ? String(body).length : 0}`;
-
+      // Withings pings a new subscription with an empty body, so an empty
+      // delivery right after subscribing is expected and harmless.
       const extras = Object.keys(args || {}).join(' ');
-      this.error(`Webhook payload not recognised as a bed event, ignored. ${shape} args=[${extras}]`);
+      this.error(
+        `Webhook payload not recognised as a bed event, ignored. `
+        + `body ${describePayload(body)} query ${describePayload(query)} args=[${extras}]`
+      );
       return;
     }
 

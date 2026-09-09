@@ -352,3 +352,20 @@ test('summariseLastNight carries the metrics of the night it picked', () => {
 
   assert.strictEqual(night.metrics.sleepScore, 99, 'the newest night, not the first');
 });
+
+test('an empty webhook body is not an event, so the caller can look elsewhere', () => {
+  // Withings pings a new subscription with an empty body, and a field report
+  // showed real deliveries arriving with one too. Returning null rather than a
+  // half-built event is what lets the device fall back to the query string.
+  assert.strictEqual(parseNotification({}), null);
+  assert.strictEqual(parseNotification(''), null);
+  assert.strictEqual(parseNotification(undefined), null);
+});
+
+test('a bed event parses the same from a query object as from a form body', () => {
+  const form = parseNotification('appli=50&userid=4819&date=1788621129');
+  const query = parseNotification({ appli: '50', userid: '4819', date: '1788621129' });
+
+  assert.deepStrictEqual(query, form);
+  assert.strictEqual(query.inBed, true);
+});
