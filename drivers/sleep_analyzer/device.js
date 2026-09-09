@@ -32,6 +32,24 @@ function describePayload(payload) {
   return keys.length ? `keys=[${keys.join(' ')}]` : 'empty';
 }
 
+/** True when a half of the envelope carries nothing at all. */
+function isEmptyPayload(payload) {
+  if (payload === undefined || payload === null || payload === '') return true;
+  if (typeof payload !== 'object') return false;
+  return Object.keys(payload).length === 0;
+}
+
+/** Whether a payload holds any field a Withings notification would carry. */
+function carriesWithingsFields(payload) {
+  if (!payload || typeof payload !== 'object') return false;
+
+  const fields = ['appli', 'userid', 'deviceid', 'date', 'startdate', 'enddate'];
+  return fields.some(field => payload[field] !== undefined);
+}
+
+/** How long a repeating log line may stay silent before it repeats itself. */
+const HEARTBEAT_MS = 15 * 60 * 1000;
+
 class SleepAnalyzerDevice extends Homey.Device {
   async onInit() {
     this.userId = this.getStore().userId || this.getData().id;
@@ -110,6 +128,41 @@ class SleepAnalyzerDevice extends Homey.Device {
         this.error(`Could not add capability ${capability}:`, err);
       }
     }
+  }
+
+  /**
+   * Logs a line that repeats every minute, without filling the log with it.
+   *
+   * Two counters here have to keep reporting: a duration that has stopped looks
+   * identical to one that never started, and a silent webhook looks identical
+   * to an empty sleep series. But a diagnostics report covering half an hour
+   * arrived with seventy four identical lines and four that mattered, so the
+   * repetition was burying the very thing it was there to show.
+   *
+   * A line is written when it says something new, and otherwise once every
+   * HEARTBEAT_MS so a running counter is still visibly running.
+   */
+  _logRepeating(key, signature, message) {
+    this._repeated = this._repeated || {};
+    const previous = this._repeated[key];
+    const now = Date.now();
+
+    // The signature is compared, the message is printed. They differ because
+    // these lines carry a minute counter that changes on every call: comparing
+    // the printed text would find it different every time and defeat the point.
+    if (previous && previous.signature === signature && now - previous.at < HEARTBEAT_MS) return;
+
+    this._repeated[key] = { signature, at: now };
+    this.log(message);
+  }
+
+  /** How long ago the last bed event was accepted, for the heartbeat lines. */
+  _sinceLastEvent() {
+    const last = this.getStoreValue('lastEventMs');
+    if (!last) return 'no bed event accepted yet';
+
+    const minutes = Math.max(0, Math.floor((Date.now() - last) / 60000));
+    return `last bed event ${minutes} min ago`;
   }
 
   /**
@@ -209,13 +262,19 @@ class SleepAnalyzerDevice extends Homey.Device {
     if (!event) {
       // Field names only, never values: enough to tell an empty delivery from
       // a payload we are failing to read, without logging who or which mat.
-      // Withings pings a new subscription with an empty body, so an empty
-      // delivery right after subscribing is expected and harmless.
       const extras = Object.keys(args || {}).join(' ');
-      this.error(
-        `Webhook payload not recognised as a bed event, ignored. `
-        + `body ${describePayload(body)} query ${describePayload(query)} args=[${extras}]`
-      );
+      const shape = `body ${describePayload(body)} query ${describePayload(query)} args=[${extras}]`;
+
+      // Withings pings a newly created subscription with nothing in it. That is
+      // normal and must not read as a fault in a diagnostics report, while a
+      // delivery that does carry Withings fields we cannot read is a real
+      // anomaly and stays one. The query is not evidence of a payload on its
+      // own: the subscription URL carries ?homey=... as routing, so it is
+      // never empty. Judge it on whether any Withings field is present.
+      const empty = isEmptyPayload(body) && !carriesWithingsFields(query);
+
+      if (empty) this.log(`Empty webhook delivery ignored, most likely a Withings subscription ping. ${shape}`);
+      else this.error(`Webhook payload not recognised as a bed event, ignored. ${shape}`);
       return;
     }
 
@@ -514,9 +573,11 @@ class SleepAnalyzerDevice extends Homey.Device {
     await this.setCapabilityValue('withings_time_in_bed_text', formatDuration(inBed ? minutes : 0, this._durationUnits)).catch(this.error);
     await this.setCapabilityValue('withings_time_out_of_bed_text', formatDuration(inBed ? 0 : minutes, this._durationUnits)).catch(this.error);
 
-    // Counters that stop moving look identical to counters that were never
-    // running. One line per minute makes the difference visible in the log.
-    this.log(`Durations: ${inBed ? 'in bed' : 'out of bed'} for ${minutes} min.`);
+    this._logRepeating(
+      'durations',
+      inBed ? 'in bed' : 'out of bed',
+      `Durations: ${inBed ? 'in bed' : 'out of bed'} for ${minutes} min, ${this._sinceLastEvent()}.`
+    );
   }
 
   /**
@@ -604,7 +665,11 @@ class SleepAnalyzerDevice extends Homey.Device {
       // The one line that shows whether polling sees anything at all: without
       // it a silent webhook and an empty sleep series look identical.
       const verdict = inBed === null ? 'no data, state left as is' : `bed ${inBed ? 'occupied' : 'empty'}`;
-      this.log(`Poll: ${series.length} series entr${series.length === 1 ? 'y' : 'ies'} in the last ${window * 2}s, ${verdict}.`);
+      this._logRepeating(
+        'poll',
+        `${series.length}:${verdict}`,
+        `Poll: ${series.length} series entr${series.length === 1 ? 'y' : 'ies'} in the last ${window * 2}s, ${verdict}.`
+      );
 
       // Only a definite reading may move the state. An absent series says
       // nothing about the bed, and the webhook may know better.
