@@ -1,4 +1,8 @@
 {
+  "1.7.8": {
+    "en": "Last night now arrives on its own even when no bed events do: the app checks for a newly scored night every hour. It also verifies with Withings that the signed-in profile owns a sleep mat and granted access to bed events, and warns on the device if not. The log now says where each credential came from.",
+    "no": "Siste natt kommer nå av seg selv også når ingen sengehendelser gjør det: appen ser etter en nylig scoret natt hver time. Den sjekker også hos Withings at profilen som logget inn eier en søvnmatte og ga tilgang til sengehendelser, og varsler på enheten hvis ikke. Loggen sier nå hvor hver legitimasjon kom fra."
+  },
   "1.7.7": {
     "en": "Bed events that arrive with an empty body are no longer lost: the app now also reads the other half of the delivery. The app log repeats itself far less, and says when the last bed event was accepted, so a diagnostics report shows what happened instead of the same line every minute.",
     "no": "Sengehendelser som kommer med tom kropp går ikke lenger tapt: appen leser nå også den andre halvdelen av leveransen. Apploggen gjentar seg langt mindre, og sier når siste sengehendelse ble godtatt, så en diagnoserapport viser hva som skjedde i stedet for samme linje hvert minutt."
