@@ -6,6 +6,7 @@ const crypto = require('crypto');
 
 const {
   WithingsApi,
+  sleepMonitors,
   WithingsError,
   buildSignature,
   normalizeCallbackUrl
@@ -500,4 +501,46 @@ test('callers waiting on one refresh all continue with the new token', async () 
   for (const call of fetchImpl.calls.filter(c => c.url.includes('/notify'))) {
     assert.strictEqual(call.headers.Authorization, 'Bearer access-shared');
   }
+});
+
+
+test('exchangeCode keeps the scope Withings actually granted', async () => {
+  const fetchImpl = fakeFetch([nonceResponse, tokenResponse({ scope: 'user.info,user.metrics' })]);
+  const api = new WithingsApi({
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    redirectUri: 'https://callback.athom.com/oauth2/callback',
+    fetchImpl
+  });
+
+  const tokens = await api.exchangeCode('the-code');
+
+  // A grant that leaves out user.sleepevents subscribes fine and then never
+  // receives a bed event; the recorded scope is what makes that diagnosable.
+  assert.strictEqual(tokens.scope, 'user.info,user.metrics');
+});
+
+test('getDevices returns the profile devices, and sleepMonitors picks the mats', async () => {
+  const fetchImpl = fakeFetch([{
+    path: '/v2/user',
+    action: 'getdevice',
+    body: { status: 0, body: { devices: [
+      { type: 'Sleep Monitor', model: 'Aura Sensor V2', model_id: 63, deviceid: 'abcdef1234' },
+      { type: 'Scale', model: 'Body+', model_id: 5, deviceid: '0123456789' }
+    ] } }
+  }]);
+  const api = new WithingsApi({
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    tokens: { accessToken: 'access-1', refreshToken: 'refresh-1', expiresAt: Date.now() + 3600000, userId: '1' },
+    fetchImpl
+  });
+
+  const devices = await api.getDevices();
+  assert.strictEqual(devices.length, 2);
+
+  const mats = sleepMonitors(devices);
+  assert.deepStrictEqual(mats.map(m => m.deviceid), ['abcdef1234']);
+  assert.deepStrictEqual(sleepMonitors([]), []);
+  assert.deepStrictEqual(sleepMonitors(undefined), []);
 });

@@ -51,7 +51,9 @@
   },
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",
-    "subscription_degraded": "Sanntidsvarsler fra Withings er nede. Sengetilstedeværelse oppdateres fortsatt, men med forsinkelse."
+    "subscription_degraded": "Sanntidsvarsler fra Withings er nede. Sengetilstedeværelse oppdateres fortsatt, men med forsinkelse.",
+    "no_mat": "Withings-profilen du logget inn med har ingen søvnmatte. Tilhører matten et annet familiemedlem, reparerer du enheten og logger inn som den personen.",
+    "missing_scope": "Withings ga ikke tilgang til sengehendelser. Reparer enheten og godta alle tillatelsene den ber om."
   },
   "units": {
     "hour": "t",

@@ -1,7 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
-const { WithingsApi } = require('../../lib/withings-api');
+const { WithingsApi, sleepMonitors } = require('../../lib/withings-api');
 const {
   parseNotification,
   deriveBedState,
@@ -81,8 +81,47 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     // Do not block onInit on the network; a failure here must not leave the
     // device permanently unavailable.
-    this.renewSubscriptions().catch(err => this.error('Initial subscribe failed:', err));
+    // The probe runs after the subscription check on purpose: a successful
+    // renewal clears the device warning, and the probe may need to set one.
+    this.renewSubscriptions()
+      .catch(err => this.error('Initial subscribe failed:', err))
+      .then(() => this._probeProfile());
     this._backfillLastNight().catch(err => this.error('Backfill failed:', err));
+  }
+
+  /**
+   * Answers, in the log and on the device, the two questions a diagnostics
+   * report could not: did Withings grant the scope bed events live behind,
+   * and does the authorized profile own a sleep mat at all.
+   *
+   * Both came out of a report where subscriptions existed, the callback was
+   * proven reachable, and Withings still never sent a bed event. Everything
+   * on this side checked out; what was left unknown was on the Withings side
+   * of the token, and that is exactly what this asks about.
+   */
+  async _probeProfile() {
+    const scope = String(this.getStoreValue('scope') || '');
+    const hasSleepEvents = /\buser\.sleepevents\b/.test(scope);
+    this.log(`Granted scope: ${scope || 'not recorded, token predates this check'}.`);
+
+    let mats;
+    try {
+      mats = sleepMonitors(await this.api.getDevices());
+    } catch (err) {
+      this.error(`Could not list the profile's devices: ${err.message}`);
+      return;
+    }
+
+    // Model and tail of the id only: enough to match a mat against later
+    // webhook lines, too little to identify anyone.
+    const described = mats.map(m => `model ${m.model_id ?? '?'} ${tag(m.deviceid)}`).join(', ');
+    this.log(`Sleep mats on the authorized profile: ${mats.length}${mats.length ? ` (${described})` : ''}.`);
+
+    if (!mats.length) {
+      await this._warn(this.homey.__('error.no_mat'));
+    } else if (scope && !hasSleepEvents) {
+      await this._warn(this.homey.__('error.missing_scope'));
+    }
   }
 
   /**
@@ -186,7 +225,9 @@ class SleepAnalyzerDevice extends Homey.Device {
 
     // Prove the new tokens work, and put the subscriptions back if the lapse
     // outlived them.
-    this.renewSubscriptions().catch(err => this.error('Post-repair subscribe failed:', err.message));
+    this.renewSubscriptions()
+      .catch(err => this.error('Post-repair subscribe failed:', err.message))
+      .then(() => this._probeProfile());
   }
 
   /**
