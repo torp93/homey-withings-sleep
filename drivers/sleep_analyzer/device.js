@@ -47,6 +47,9 @@ function carriesWithingsFields(payload) {
   return fields.some(field => payload[field] !== undefined);
 }
 
+/** How often to ask Withings whether a newer scored night has appeared. */
+const SUMMARY_SWEEP_MS = 60 * 60 * 1000;
+
 /** How long a repeating log line may stay silent before it repeats itself. */
 const HEARTBEAT_MS = 15 * 60 * 1000;
 
@@ -360,6 +363,22 @@ class SleepAnalyzerDevice extends Homey.Device {
    * ask when that will be. Rather than poll all day, try a few times with
    * growing gaps and stop as soon as a night newer than the bed-out appears.
    */
+  /**
+   * Hourly look for a night Withings has scored since the last one we showed.
+   *
+   * Announcing is what fires the summary Flow card, so it must happen once per
+   * night and not once per sweep. Asking only for a night newer than the one
+   * already on display is what makes that true: the same night comes back
+   * every hour until the next one is scored, and each of those is a no-op.
+   */
+  async _sweepForNewNight() {
+    try {
+      await this._backfillLastNight({ announce: true, newerThanMs: (this._summarySeenMs || 0) + 1 });
+    } catch (err) {
+      this.error('Hourly summary sweep failed:', err.message);
+    }
+  }
+
   _scheduleSummaryChase(afterMs) {
     for (const timer of this._chaseTimers || []) this.homey.clearTimeout(timer);
     this._chaseTimers = [];
@@ -427,7 +446,13 @@ class SleepAnalyzerDevice extends Homey.Device {
     }
 
     if (night.endMs < newerThanMs) {
-      this.log('Backfill: the newest scored night predates the last bed-out, still waiting.');
+      // Hit every hour by the sweep once a night is on display, and after a
+      // bed-out until Withings scores it. Neither is worth a line each time.
+      this._logRepeating(
+        'backfill-waiting',
+        String(night.endMs),
+        'Backfill: the newest scored night is not newer than the one already shown, still waiting.'
+      );
       return;
     }
 
@@ -724,18 +749,28 @@ class SleepAnalyzerDevice extends Homey.Device {
       () => this._updateDurations().catch(err => this.error(err)),
       60 * 1000
     );
+
+    // Until now a scored night was only fetched at startup, after a bed-out
+    // event, or by hand. A mat that uploads through the phone app rather than
+    // over its own Wi-Fi delivers no bed events at all, so for those users the
+    // only automatic attempt was the one at startup, which normally happens
+    // long before Withings has scored the night. The night then never arrived,
+    // even though the app could have had it for the asking.
+    this._summaryTimer = this.homey.setInterval(() => this._sweepForNewNight(), SUMMARY_SWEEP_MS);
   }
 
   _stopTimers() {
     if (this._pollTimer) this.homey.clearInterval(this._pollTimer);
     if (this._renewTimer) this.homey.clearInterval(this._renewTimer);
     if (this._durationTimer) this.homey.clearInterval(this._durationTimer);
+    if (this._summaryTimer) this.homey.clearInterval(this._summaryTimer);
     for (const timer of this._chaseTimers || []) this.homey.clearTimeout(timer);
     this._chaseTimers = [];
 
     this._pollTimer = null;
     this._renewTimer = null;
     this._durationTimer = null;
+    this._summaryTimer = null;
   }
 
   async onSettings({ newSettings, changedKeys }) {
