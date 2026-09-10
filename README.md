@@ -181,7 +181,7 @@ Homey Pro instead and needs no Docker.
 
 ## Publishing
 
-The app is at 1.7.6 and passes `homey app validate --level publish`.
+The app is at 1.7.8 and passes `homey app validate --level publish`.
 
 ```bash
 npm test
@@ -193,8 +193,6 @@ homey app publish
 Athom's review. The version in `app.json` must be bumped for every submission,
 and every version needs a matching entry in `.homeychangelog.json`.
 
-One thing is still open before a broad release:
-
-- **Withings API mode.** The Withings application backing the app is in
-  development mode, which caps it at ten linked users. Lifting that requires
-  the callback URL to satisfy Withings' rules for a production application.
+The Withings application backing the app is in production mode, whose free
+tier allows 1000 active users. It sat in development mode, capped at ten, until
+September 2026; the cap was never enforced, and users kept linking past it.
