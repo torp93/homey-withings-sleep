@@ -20,6 +20,13 @@ class WithingsSleepApp extends Homey.App {
       .join(' ');
     this.log(`Environment probe: ${seen}`);
 
+    // The probe above says what the environment carries; this says what was
+    // actually used. Settings override the environment, so a value typed into
+    // the advanced section silently replaces the app's own, and a report that
+    // only showed the environment could not tell the two apart.
+    const used = CONFIG_KEYS.map(key => `${key}=${this.configSource(key) || 'missing'}`).join(' ');
+    this.log(`Credential sources in use: ${used}`);
+
     const missing = CONFIG_KEYS.filter(key => !this._config(key));
     if (missing.length) {
       this.error(`Missing configuration: ${missing.join(', ')}: set these in the app settings.`);
@@ -64,6 +71,12 @@ class WithingsSleepApp extends Homey.App {
       .find(([, env]) => WithingsSleepApp._envValue(env, key));
 
     return found ? found[0] : null;
+  }
+
+  /** Where a key's value comes from, by the same precedence as _config. */
+  configSource(key) {
+    if (this.homey.settings.get(key)) return 'settings';
+    return this.envSource(key);
   }
 
   /**
