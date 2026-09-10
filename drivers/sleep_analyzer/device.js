@@ -309,15 +309,18 @@ class SleepAnalyzerDevice extends Homey.Device {
       const extras = Object.keys(args || {}).join(' ');
       const shape = `body ${describePayload(body)} query ${describePayload(query)} args=[${extras}]`;
 
-      // Withings pings a newly created subscription with nothing in it. That is
-      // normal and must not read as a fault in a diagnostics report, while a
-      // delivery that does carry Withings fields we cannot read is a real
-      // anomaly and stays one. The query is not evidence of a payload on its
-      // own: the subscription URL carries ?homey=... as routing, so it is
+      // Two things arrive with nothing in them, and both are normal: Withings
+      // verifies the callback with a HEAD before it registers a subscription,
+      // one per category, and the app's own connection test sends the same
+      // HEAD to the same URL. Athom's relay forwards both as messages with an
+      // empty body. Neither must read as a fault in a diagnostics report,
+      // while a delivery that does carry Withings fields we cannot read is a
+      // real anomaly and stays one. The query is not evidence of a payload on
+      // its own: the subscription URL carries ?homey=... as routing, so it is
       // never empty. Judge it on whether any Withings field is present.
       const empty = isEmptyPayload(body) && !carriesWithingsFields(query);
 
-      if (empty) this.log(`Empty webhook delivery ignored, most likely a Withings subscription ping. ${shape}`);
+      if (empty) this.log(`Empty webhook delivery ignored: a Withings callback check or this app's own connection test, not a bed event. ${shape}`);
       else this.error(`Webhook payload not recognised as a bed event, ignored. ${shape}`);
       return;
     }
