@@ -3,9 +3,9 @@
 const { WithingsApi } = require('./lib/withings-api');
 
 /** Never echo a secret back to the settings page; say only whether one exists. */
-function describe(value) {
+function describe(value, homey) {
   if (!value) return null;
-  return `${String(value).slice(0, 6)}… (${String(value).length} tegn)`;
+  return `${String(value).slice(0, 6)}… (${homey.__('settings.check.chars', { n: String(value).length })})`;
 }
 
 module.exports = {
@@ -66,7 +66,7 @@ module.exports = {
             .filter(k => env && Object.prototype.hasOwnProperty.call(env, k) && env[k])
         ])
       ),
-      clientId: describe(clientId),
+      clientId: describe(clientId, homey),
       homeyId: null,
       // The exact string this Homey subscribes with. Shown so nobody has to go
       // hunting for their Homey id in the developer tools.
@@ -77,19 +77,19 @@ module.exports = {
 
     // --- Withings -----------------------------------------------------------
     if (!clientId || !clientSecret) {
-      result.withings.message = 'Client ID eller secret mangler.';
+      result.withings.message = homey.__('settings.check.missing_credentials');
     } else {
       try {
         const api = new WithingsApi({ clientId, clientSecret });
         await api.verifyCredentials();
         result.withings.ok = true;
-        result.withings.message = 'Withings godtok ID og secret.';
+        result.withings.message = homey.__('settings.check.withings_ok');
       } catch (err) {
         // Withings answers HTTP 200 and puts the failure in the body, so the
         // status here is theirs, not the transport's.
         result.withings.message = err.status
-          ? `Withings avviste kallet (${err.status}): ${err.message}`
-          : `Kunne ikke nå Withings: ${err.message}`;
+          ? homey.__('settings.check.withings_rejected', { status: err.status, message: err.message })
+          : homey.__('settings.check.withings_unreachable', { message: err.message });
       }
     }
 
@@ -101,11 +101,11 @@ module.exports = {
     }
 
     if (!webhookId || !webhookSecret) {
-      result.webhook.message = 'Ikke satt opp, appen faller tilbake til polling.';
+      result.webhook.message = homey.__('settings.check.webhook_missing');
     } else {
       try {
         const homeyId = result.homeyId;
-        if (!homeyId) throw new Error('fant ikke Homey-ID');
+        if (!homeyId) throw new Error(homey.__('settings.check.no_homey_id'));
 
         // Must match drivers/sleep_analyzer/device.js exactly: this is the
         // string Withings is asked to deliver to.
@@ -118,10 +118,10 @@ module.exports = {
 
         result.webhook.ok = response.ok;
         result.webhook.message = response.ok
-          ? 'Athoms webhook svarer.'
-          : `Webhook svarte HTTP ${response.status}.`;
+          ? homey.__('settings.check.webhook_ok')
+          : homey.__('settings.check.webhook_status', { status: response.status });
       } catch (err) {
-        result.webhook.message = `Kunne ikke nå webhooken: ${err.message}`;
+        result.webhook.message = homey.__('settings.check.webhook_unreachable', { message: err.message });
       }
     }
 

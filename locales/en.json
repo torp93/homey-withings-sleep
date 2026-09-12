@@ -47,7 +47,20 @@
     "builtin_ready": "✓ The app has its own Withings credentials. Nothing is required of you.",
     "builtin_missing": "✗ The app has no credentials. Enter your own under Advanced.",
     "advanced_title": "Advanced: use your own Withings application",
-    "advanced_intro": "Only for running against your own Withings application instead of the app's. Ordinary users do not need this, and leaving the fields empty means the app's own credentials are used."
+    "advanced_intro": "Only for running against your own Withings application instead of the app's. Ordinary users do not need this, and leaving the fields empty means the app's own credentials are used.",
+    "check": {
+      "chars": "__n__ characters",
+      "empty": "empty",
+      "missing_credentials": "Client ID or secret is missing.",
+      "withings_ok": "Withings accepted the ID and secret.",
+      "withings_rejected": "Withings rejected the call (__status__): __message__",
+      "withings_unreachable": "Could not reach Withings: __message__",
+      "webhook_missing": "Not set up; the app falls back to polling.",
+      "no_homey_id": "could not determine the Homey id",
+      "webhook_ok": "Athom's webhook answers.",
+      "webhook_status": "The webhook answered HTTP __status__.",
+      "webhook_unreachable": "Could not reach the webhook: __message__"
+    }
   },
   "error": {
     "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",

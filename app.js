@@ -16,7 +16,7 @@ class WithingsSleepApp extends Homey.App {
 
     // Names only: which accessor carries each key, never the value itself.
     const seen = Object.entries(this.envSources)
-      .map(([name, env]) => `${name}=[${CONFIG_KEYS.filter(k => WithingsSleepApp._envValue(env, k)).join(' ') || 'tom'}]`)
+      .map(([name, env]) => `${name}=[${CONFIG_KEYS.filter(k => WithingsSleepApp._envValue(env, k)).join(' ') || 'none'}]`)
       .join(' ');
     this.log(`Environment probe: ${seen}`);
 

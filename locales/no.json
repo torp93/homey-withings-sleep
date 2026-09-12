@@ -47,7 +47,20 @@
     "builtin_ready": "✓ Appen har sin egen Withings-legitimasjon. Du trenger ikke fylle inn noe.",
     "builtin_missing": "✗ Appen mangler legitimasjon. Legg inn din egen under Avansert.",
     "advanced_title": "Avansert: bruk din egen Withings-applikasjon",
-    "advanced_intro": "Bare for deg som vil kjøre mot din egen Withings-applikasjon i stedet for appens. Vanlige brukere trenger ikke dette, og tomme felter betyr at appens egen legitimasjon brukes."
+    "advanced_intro": "Bare for deg som vil kjøre mot din egen Withings-applikasjon i stedet for appens. Vanlige brukere trenger ikke dette, og tomme felter betyr at appens egen legitimasjon brukes.",
+    "check": {
+      "chars": "__n__ tegn",
+      "empty": "tom",
+      "missing_credentials": "Client ID eller secret mangler.",
+      "withings_ok": "Withings godtok ID og secret.",
+      "withings_rejected": "Withings avviste kallet (__status__): __message__",
+      "withings_unreachable": "Kunne ikke nå Withings: __message__",
+      "webhook_missing": "Ikke satt opp, appen faller tilbake til polling.",
+      "no_homey_id": "fant ikke Homey-ID",
+      "webhook_ok": "Athoms webhook svarer.",
+      "webhook_status": "Webhooken svarte HTTP __status__.",
+      "webhook_unreachable": "Kunne ikke nå webhooken: __message__"
+    }
   },
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",
