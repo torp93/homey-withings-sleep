@@ -52,7 +52,7 @@
   "error": {
     "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",
     "subscription_degraded": "Realtime notifications from Withings are down. Bed presence still updates, but with a delay.",
-    "no_mat": "The Withings profile you signed in with has no sleep mat. If the mat belongs to another family member, repair the device and sign in as that person.",
+    "no_mat": "The Withings profile you signed in with has no sleep mat. If your account has several profiles, repair the device and sign in as the one the mat belongs to. If it has only one, Withings has the mat attached to a profile it no longer shows: in the Withings app, open the mat's settings and reassign it to yourself, or remove it and add it again, then repair the device.",
     "missing_scope": "Withings did not grant access to bed events. Repair the device and accept every permission it asks for."
   },
   "units": {

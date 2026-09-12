@@ -52,7 +52,7 @@
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",
     "subscription_degraded": "Sanntidsvarsler fra Withings er nede. Sengetilstedeværelse oppdateres fortsatt, men med forsinkelse.",
-    "no_mat": "Withings-profilen du logget inn med har ingen søvnmatte. Tilhører matten et annet familiemedlem, reparerer du enheten og logger inn som den personen.",
+    "no_mat": "Withings-profilen du logget inn med har ingen søvnmatte. Har kontoen flere profiler, reparerer du enheten og logger inn som den matten tilhører. Har den bare én, ligger matten hos Withings på en profil som ikke lenger vises: åpne mattens innstillinger i Withings-appen og tildel den til deg selv, eller fjern den og legg den til igjen, og reparer så enheten.",
     "missing_scope": "Withings ga ikke tilgang til sengehendelser. Reparer enheten og godta alle tillatelsene den ber om."
   },
   "units": {

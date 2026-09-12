@@ -1,7 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
-const { WithingsApi, sleepMonitors } = require('../../lib/withings-api');
+const { WithingsApi, sleepMonitors, summariseDevices } = require('../../lib/withings-api');
 const {
   parseNotification,
   deriveBedState,
@@ -108,18 +108,42 @@ class SleepAnalyzerDevice extends Homey.Device {
     const hasSleepEvents = /\buser\.sleepevents\b/.test(scope);
     this.log(`Granted scope: ${scope || 'not recorded, token predates this check'}.`);
 
-    let mats;
+    let devices;
     try {
-      mats = sleepMonitors(await this.api.getDevices());
+      devices = await this.api.getDevices();
     } catch (err) {
       this.error(`Could not list the profile's devices: ${err.message}`);
       return;
     }
 
+    // The first report that reached this line said "0 mats" and nothing
+    // else, which left two very different situations indistinguishable: a
+    // token for a profile that owns nothing, and a token for a profile that
+    // owns the user's other devices but not the mat. The whole list, by type,
+    // separates them. Tail of the user id only, to line up against the
+    // repair log; never the id itself.
+    const mats = sleepMonitors(devices);
+    const shape = summariseDevices(devices);
+    this.log(
+      `Devices on the authorized profile (user ${tag(this.userId)}): ${shape.total}`
+      + `${shape.total ? ` [${shape.types.join(', ')}]` : ''}.`
+    );
+
     // Model and tail of the id only: enough to match a mat against later
     // webhook lines, too little to identify anyone.
     const described = mats.map(m => `model ${m.model_id ?? '?'} ${tag(m.deviceid)}`).join(', ');
     this.log(`Sleep mats on the authorized profile: ${mats.length}${mats.length ? ` (${described})` : ''}.`);
+
+    // And the same question asked of the data instead of the device list: a
+    // profile that owns the mat has scored nights. Thirty days is wide enough
+    // that a holiday does not read as an empty profile.
+    try {
+      const now = Date.now();
+      const nights = await this.api.getSleepSummary(this._ymd(now - 30 * 24 * 3600 * 1000), this._ymd(now));
+      this.log(`Scored nights on the authorized profile in the last 30 days: ${Array.isArray(nights) ? nights.length : 0}.`);
+    } catch (err) {
+      this.error(`Could not count the profile's nights: ${err.message}`);
+    }
 
     if (!mats.length) {
       await this._warn(this.homey.__('error.no_mat'));

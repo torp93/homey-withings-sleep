@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const {
   WithingsApi,
   sleepMonitors,
+  summariseDevices,
   WithingsError,
   buildSignature,
   normalizeCallbackUrl
@@ -543,4 +544,22 @@ test('getDevices returns the profile devices, and sleepMonitors picks the mats',
   assert.deepStrictEqual(mats.map(m => m.deviceid), ['abcdef1234']);
   assert.deepStrictEqual(sleepMonitors([]), []);
   assert.deepStrictEqual(sleepMonitors(undefined), []);
+});
+
+
+test('summariseDevices tells an empty profile from one that merely lacks the mat', () => {
+  // The two situations call for different fixes on the user's side, and a
+  // bare mat count could not tell them apart.
+  assert.deepStrictEqual(summariseDevices([]), { total: 0, types: [], mats: 0 });
+  assert.deepStrictEqual(summariseDevices(undefined), { total: 0, types: [], mats: 0 });
+
+  const noMat = summariseDevices([
+    { type: 'Scale', model_id: 5 },
+    { type: 'Blood Pressure Monitor', model_id: 44 },
+    { type: 'Scale', model_id: 6 }
+  ]);
+  assert.deepStrictEqual(noMat, { total: 3, types: ['Blood Pressure Monitor', 'Scale x2'], mats: 0 });
+
+  const withMat = summariseDevices([{ type: 'Sleep Monitor', model_id: 63 }, { type: 'Scale' }]);
+  assert.deepStrictEqual(withMat, { total: 2, types: ['Scale', 'Sleep Monitor'], mats: 1 });
 });
