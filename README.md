@@ -181,7 +181,7 @@ Homey Pro instead and needs no Docker.
 
 ## Publishing
 
-The app is at 1.7.9 and passes `homey app validate --level publish`.
+The app is at 1.7.10 and passes `homey app validate --level publish`.
 
 ```bash
 npm test
