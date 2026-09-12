@@ -47,6 +47,10 @@
     "testCredentials": {
       "method": "POST",
       "path": "/testCredentials"
+    },
+    "getProfiles": {
+      "method": "GET",
+      "path": "/profiles"
     }
   },
   "author": {

@@ -60,7 +60,15 @@
       "webhook_ok": "Athom's webhook answers.",
       "webhook_status": "The webhook answered HTTP __status__.",
       "webhook_unreachable": "Could not reach the webhook: __message__"
-    }
+    },
+    "show_profiles": "Show what my Withings login can see",
+    "profiles_none": "No device paired yet, so there is no Withings login to ask.",
+    "profiles_user": "profile",
+    "profiles_devices": "Devices",
+    "profiles_no_devices": "none. This login sees no devices at all; the mat is on a profile Withings is not showing you.",
+    "profiles_nights": "Scored nights, last 30 days",
+    "profiles_weight": "Latest weighing",
+    "profiles_error": "Could not ask Withings"
   },
   "error": {
     "reauthorize": "The connection to Withings must be authorized again. Remove the device and add it back.",

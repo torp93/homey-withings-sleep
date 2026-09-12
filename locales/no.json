@@ -60,7 +60,15 @@
       "webhook_ok": "Athoms webhook svarer.",
       "webhook_status": "Webhooken svarte HTTP __status__.",
       "webhook_unreachable": "Kunne ikke nå webhooken: __message__"
-    }
+    },
+    "show_profiles": "Vis hva Withings-innloggingen min ser",
+    "profiles_none": "Ingen enhet er paret ennå, så det finnes ingen Withings-innlogging å spørre.",
+    "profiles_user": "profil",
+    "profiles_devices": "Enheter",
+    "profiles_no_devices": "ingen. Denne innloggingen ser ingen enheter i det hele tatt; matten ligger på en profil Withings ikke viser deg.",
+    "profiles_nights": "Scorede netter, siste 30 dager",
+    "profiles_weight": "Siste veiing",
+    "profiles_error": "Fikk ikke spurt Withings"
   },
   "error": {
     "reauthorize": "Tilkoblingen til Withings må godkjennes på nytt. Fjern enheten og legg den til igjen.",

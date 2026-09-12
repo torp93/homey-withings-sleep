@@ -563,3 +563,34 @@ test('summariseDevices tells an empty profile from one that merely lacks the mat
   const withMat = summariseDevices([{ type: 'Sleep Monitor', model_id: 63 }, { type: 'Scale' }]);
   assert.deepStrictEqual(withMat, { total: 2, types: ['Scale', 'Sleep Monitor'], mats: 1 });
 });
+
+
+test('getMeasures decodes Withings\' integer-and-exponent values and sorts newest first', async () => {
+  const fetchImpl = fakeFetch([{
+    path: '/measure',
+    action: 'getmeas',
+    body: { status: 0, body: { measuregrps: [
+      { date: 1700000000, deviceid: 'dev1', measures: [{ type: 1, value: 84300, unit: -3 }] },
+      { date: 1700086400, deviceid: 'dev1', measures: [{ type: 1, value: 991, unit: -1 }, { type: 6, value: 2345, unit: -2 }] }
+    ] } }
+  }]);
+  const api = new WithingsApi({
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    tokens: { accessToken: 'access-1', refreshToken: 'refresh-1', expiresAt: Date.now() + 3600000, userId: '1' },
+    fetchImpl
+  });
+
+  const groups = await api.getMeasures({ types: [1, 6] });
+
+  // A weight of 84.3 kg arrives as 84300 with unit -3; the caller sees kilograms.
+  assert.strictEqual(groups.length, 2);
+  assert.strictEqual(groups[0].date, 1700086400);
+  assert.ok(Math.abs(groups[0].values[1] - 99.1) < 1e-9);
+  assert.ok(Math.abs(groups[0].values[6] - 23.45) < 1e-9);
+  assert.ok(Math.abs(groups[1].values[1] - 84.3) < 1e-9);
+
+  const call = fetchImpl.calls.find(c => c.url.includes('/measure'));
+  assert.strictEqual(call.params.meastypes, '1,6');
+  assert.strictEqual(call.params.category, '1');
+});

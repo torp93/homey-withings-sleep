@@ -8,7 +8,68 @@ function describe(value, homey) {
   return `${String(value).slice(0, 6)}… (${homey.__('settings.check.chars', { n: String(value).length })})`;
 }
 
+/** Enough of an identifier to line up with the app log, too little to identify anyone. */
+function tail(value) {
+  const s = String(value || '');
+  return s.length <= 4 ? '…' : `…${s.slice(-4)}`;
+}
+
 module.exports = {
+  /**
+   * What each paired Withings login can actually see: its devices, how many
+   * nights Withings has scored for it, and its latest weighing if a scale is
+   * among the devices.
+   *
+   * This is the startup probe with a button on it. It exists because a user
+   * whose login had landed on a profile without the mat could only learn
+   * that from a diagnostics report; now the settings page says so directly.
+   * Nothing here needs the app's credentials: every call runs on the paired
+   * device's own token, so it works for users of the built-in application
+   * and of their own alike.
+   */
+  async getProfiles({ homey }) {
+    const driver = homey.drivers.getDriver('sleep_analyzer');
+    const profiles = [];
+
+    for (const device of driver.getDevices()) {
+      const entry = {
+        name: device.getName(),
+        user: tail(device.userId),
+        devices: [],
+        nights: null,
+        weight: null,
+        error: null
+      };
+
+      try {
+        const list = await device.api.getDevices();
+        // Withings still files every sleep mat under the name of the 2014
+        // sensor it descends from, which no user recognises. Say what it is.
+        entry.devices = list.map(d => ({
+          type: String(d.type || '?'),
+          model: /aura sensor v2/i.test(String(d.model)) ? 'Sleep / Sleep Analyzer' : String(d.model || '')
+        }));
+
+        const now = Date.now();
+        const nights = await device.api.getSleepSummary(device._ymd(now - 30 * 24 * 3600 * 1000), device._ymd(now));
+        entry.nights = Array.isArray(nights) ? nights.length : 0;
+
+        if (list.some(d => /scale/i.test(String(d.type)))) {
+          const latest = (await device.api.getMeasures({ types: [1] }))[0];
+          if (latest && latest.values[1] !== undefined) {
+            entry.weight = { kg: Math.round(latest.values[1] * 10) / 10, at: latest.date * 1000 };
+          }
+        }
+      } catch (err) {
+        entry.error = err.message;
+      }
+
+      profiles.push(entry);
+    }
+
+    return profiles;
+  },
+
   /**
    * This Homey's id and the exact URL it subscribes with.
    *

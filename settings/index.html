@@ -9,6 +9,11 @@
   <button id="test" class="homey-button-primary-full" data-i18n="settings.test"></button>
 </p>
 
+<p>
+  <button id="profiles" class="homey-button-secondary-full" data-i18n="settings.show_profiles"></button>
+</p>
+<pre id="profilesResult"></pre>
+
 <details>
   <summary data-i18n="settings.advanced_title"></summary>
 
@@ -214,6 +219,43 @@
         const copy = document.getElementById('copyUrl');
         copy.hidden = false;
         copy.onclick = () => copyText(res.webhookUrl, copy);
+      });
+    });
+
+    document.getElementById('profiles').addEventListener('click', () => {
+      const out = document.getElementById('profilesResult');
+      out.textContent = Homey.__('settings.testing');
+
+      Homey.api('GET', '/profiles', null, (err, res) => {
+        if (err) {
+          out.textContent = `${Homey.__('settings.test_failed')}: ${err.message || err}`;
+          return;
+        }
+
+        if (!res.length) {
+          out.textContent = Homey.__('settings.profiles_none');
+          return;
+        }
+
+        out.textContent = res.map(p => {
+          const lines = [`${p.name} (${Homey.__('settings.profiles_user')} ${p.user})`];
+
+          if (p.error) {
+            lines.push(`  ${Homey.__('settings.profiles_error')}: ${p.error}`);
+            return lines.join('\n');
+          }
+
+          lines.push(`  ${Homey.__('settings.profiles_devices')}: ${p.devices.length
+            ? p.devices.map(d => (d.model ? `${d.type} (${d.model})` : d.type)).join(', ')
+            : Homey.__('settings.profiles_no_devices')}`);
+          lines.push(`  ${Homey.__('settings.profiles_nights')}: ${p.nights}`);
+
+          if (p.weight) {
+            lines.push(`  ${Homey.__('settings.profiles_weight')}: ${p.weight.kg} kg, ${new Date(p.weight.at).toLocaleString()}`);
+          }
+
+          return lines.join('\n');
+        }).join('\n\n');
       });
     });
 
