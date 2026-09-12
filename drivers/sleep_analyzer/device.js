@@ -7,6 +7,7 @@ const {
   deriveBedState,
   shouldAcceptEvent,
   rememberEvent,
+  shouldPoll,
   summariseLastNight,
   formatDuration
 } = require('../../lib/bed-state');
@@ -46,6 +47,9 @@ function carriesWithingsFields(payload) {
   const fields = ['appli', 'userid', 'deviceid', 'date', 'startdate', 'enddate'];
   return fields.some(field => payload[field] !== undefined);
 }
+
+/** How long an accepted bed event vouches for the webhook still working. */
+const WEBHOOK_TRUSTED_MS = 30 * 60 * 60 * 1000;
 
 /** How often to ask Withings whether a newer scored night has appeared. */
 const SUMMARY_SWEEP_MS = 60 * 60 * 1000;
@@ -712,6 +716,19 @@ class SleepAnalyzerDevice extends Homey.Device {
     // growing pile of open calls against the same account.
     if (this._polling) {
       this.log('Poll skipped, the previous one is still running.');
+      return;
+    }
+
+    const lastEventMs = Number(this.getStoreValue('lastEventMs')) || null;
+
+    if (!shouldPoll({
+      hasWebhook: Boolean(this.webhookUrl),
+      reconciled: Boolean(this._reconciled),
+      lastEventMs,
+      nowMs: Date.now(),
+      trustedMs: WEBHOOK_TRUSTED_MS
+    })) {
+      this._logRepeating('poll', 'skipped', `Poll skipped, ${this._sinceLastEvent()} and the webhook is delivering.`);
       return;
     }
 

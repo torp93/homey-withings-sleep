@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 
-const { parseNotification, deriveBedState } = require('../lib/bed-state');
+const { parseNotification, deriveBedState, shouldPoll } = require('../lib/bed-state');
 
 test('parseNotification reads a bed-in event', () => {
   const event = parseNotification({ userid: '12345678', appli: '50', startdate: '1700000000' });
@@ -368,4 +368,43 @@ test('a bed event parses the same from a query object as from a form body', () =
 
   assert.deepStrictEqual(query, form);
   assert.strictEqual(query.inBed, true);
+});
+
+
+const POLL_BASE = {
+  hasWebhook: true,
+  reconciled: true,
+  lastEventMs: 1_000_000_000_000,
+  nowMs: 1_000_000_000_000 + 60_000,
+  trustedMs: 30 * 60 * 60 * 1000
+};
+
+test('a proven webhook makes the safety-net poll unnecessary', () => {
+  // Sixty of an installation's sixty-two hourly requests are this poll, and it
+  // has never caught anything the webhook did not.
+  assert.strictEqual(shouldPoll(POLL_BASE), false);
+});
+
+test('the startup poll always runs, webhook or not', () => {
+  // It reconciles a state that may have changed while nobody was listening.
+  assert.strictEqual(shouldPoll({ ...POLL_BASE, reconciled: false }), true);
+});
+
+test('without a webhook the poll is the only source there is', () => {
+  assert.strictEqual(shouldPoll({ ...POLL_BASE, hasWebhook: false }), true);
+});
+
+test('a webhook that has never delivered has proved nothing', () => {
+  // Exactly the reporting user's case: subscriptions in place, not one event.
+  assert.strictEqual(shouldPoll({ ...POLL_BASE, lastEventMs: null }), true);
+});
+
+test('polling resumes once the webhook has gone quiet for too long', () => {
+  const quiet = { ...POLL_BASE, nowMs: POLL_BASE.lastEventMs + POLL_BASE.trustedMs };
+  assert.strictEqual(shouldPoll(quiet), true);
+
+  // A waking day is not silence: someone who got up this morning is still
+  // covered by last night's event.
+  const sameDay = { ...POLL_BASE, nowMs: POLL_BASE.lastEventMs + 20 * 60 * 60 * 1000 };
+  assert.strictEqual(shouldPoll(sameDay), false);
 });
