@@ -37,7 +37,7 @@ module.exports = {
         user: tail(device.userId),
         devices: [],
         nights: null,
-        weight: null,
+        weighedAt: null,
         error: null
       };
 
@@ -54,10 +54,14 @@ module.exports = {
         const nights = await device.api.getSleepSummary(device._ymd(now - 30 * 24 * 3600 * 1000), device._ymd(now));
         entry.nights = Array.isArray(nights) ? nights.length : 0;
 
+        // When, never how much. This screen exists to be screenshotted and
+        // sent to whoever is helping, and a weighing's date proves the token
+        // can read the scale just as well as its value would, without handing
+        // a stranger someone's weight.
         if (list.some(d => /scale/i.test(String(d.type)))) {
           const latest = (await device.api.getMeasures({ types: [1] }))[0];
           if (latest && latest.values[1] !== undefined) {
-            entry.weight = { kg: Math.round(latest.values[1] * 10) / 10, at: latest.date * 1000 };
+            entry.weighedAt = latest.date * 1000;
           }
         }
       } catch (err) {

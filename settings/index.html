@@ -250,8 +250,8 @@
             : Homey.__('settings.profiles_no_devices')}`);
           lines.push(`  ${Homey.__('settings.profiles_nights')}: ${p.nights}`);
 
-          if (p.weight) {
-            lines.push(`  ${Homey.__('settings.profiles_weight')}: ${p.weight.kg} kg, ${new Date(p.weight.at).toLocaleString()}`);
+          if (p.weighedAt) {
+            lines.push(`  ${Homey.__('settings.profiles_weight')}: ${new Date(p.weighedAt).toLocaleString()}`);
           }
 
           return lines.join('\n');
