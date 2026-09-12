@@ -1,4 +1,8 @@
 {
+  "1.7.9": {
+    "en": "The startup check now lists every device on the signed-in Withings profile and how many nights it has scored, so a mat that Withings has attached to a hidden profile can be told apart from a login that landed on the wrong one; the warning on the device says what to do in each case. Polling backs off while the webhook is delivering, cutting requests to Withings by over ninety percent. The connection test now speaks your language.",
+    "no": "Oppstartssjekken lister nå alle enheter på den innloggede Withings-profilen og hvor mange netter den har scoret, slik at en matte Withings har festet til en skjult profil kan skilles fra en innlogging som havnet på feil; advarselen på enheten sier hva som skal gjøres i hvert tilfelle. Pollingen trekker seg tilbake mens webhooken leverer, som kutter kallene til Withings med over nitti prosent. Tilkoblingstesten snakker nå språket ditt."
+  },
   "1.7.8": {
     "en": "Last night now arrives on its own even when no bed events do: the app checks for a newly scored night every hour. It also verifies with Withings that the signed-in profile owns a sleep mat and granted access to bed events, and warns on the device if not. The log now says where each credential came from.",
     "no": "Siste natt kommer nå av seg selv også når ingen sengehendelser gjør det: appen ser etter en nylig scoret natt hver time. Den sjekker også hos Withings at profilen som logget inn eier en søvnmatte og ga tilgang til sengehendelser, og varsler på enheten hvis ikke. Loggen sier nå hvor hver legitimasjon kom fra."
