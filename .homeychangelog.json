@@ -1,4 +1,8 @@
 {
+  "1.7.11": {
+    "en": "Each bed event now records how long it spent between Withings stamping it and your Homey receiving it. If the bed reacts later than you expect, the app log now shows whether the time goes to Withings or to Homey.",
+    "no": "Hver sengehendelse noterer nå hvor lang tid den brukte fra Withings stemplet den til Homeyen din mottok den. Reagerer senga senere enn du venter, viser apploggen nå om tiden går hos Withings eller hos Homey."
+  },
   "1.7.10": {
     "en": "The app settings gain a button that shows what your Withings login can see: the devices on that profile, how many nights Withings has scored for it, and when the latest weighing was. Useful when bed events or sleep summaries never arrive, since it reveals a login that has landed on a profile without the mat. It shows no weight or other measurements.",
     "no": "Appinnstillingene har fått en knapp som viser hva Withings-innloggingen din ser: enhetene på profilen, hvor mange netter Withings har scoret for den, og når siste veiing var. Nyttig når sengehendelser eller søvnsammendrag aldri kommer, siden den avslører en innlogging som har havnet på en profil uten matten. Den viser ingen vekt eller andre målinger."
