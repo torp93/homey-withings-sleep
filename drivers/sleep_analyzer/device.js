@@ -384,11 +384,21 @@ class SleepAnalyzerDevice extends Homey.Device {
       return;
     }
 
-    this.log(`Webhook: appli ${event.appli}, ${event.inBed ? 'in bed' : 'out of bed'}`);
-
     // Withings stamps the event itself; delivery adds a few seconds, so prefer
     // their clock over ours for the displayed time.
     const eventMs = event.date ? event.date * 1000 : Date.now();
+
+    // How long the event spent between Withings and here. A user asking why
+    // the bed reacts slowly needs this split out: the mat deciding, then the
+    // delivery, then us. Everything after this line is sub-second, so a large
+    // number here is upstream and nothing the app can shorten. Withings stamps
+    // whole seconds, so treat a negative difference as clock skew, not speed.
+    const deliveryMs = event.date ? Date.now() - eventMs : null;
+    const delivery = deliveryMs === null ? 'no timestamp'
+      : deliveryMs < 0 ? 'stamped ahead of our clock'
+        : `delivered ${(deliveryMs / 1000).toFixed(1)}s after Withings stamped it`;
+
+    this.log(`Webhook: appli ${event.appli}, ${event.inBed ? 'in bed' : 'out of bed'}, ${delivery}`);
 
     this._recordEvent(verdict.key, eventMs)
       .then(() => this._setBedState(event.inBed, eventMs))
