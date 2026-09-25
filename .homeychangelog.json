@@ -1,4 +1,8 @@
 {
+  "1.7.12": {
+    "en": "Fixes more than one Sleep Analyzer on the same Homey: only the most recently added mat reported getting in and out of bed, and the others stayed silent. Every mat now receives its own bed events, including mats on different Withings profiles. Just update; there is no need to remove or re-pair anything. Thanks to the user whose diagnostics report showed exactly this.",
+    "no": "Retter flere Sleep Analyzer-matter på samme Homey: bare den sist tillagte matta meldte at du la deg og sto opp, mens de andre var stille. Nå får hver matte sine egne sengehendelser, også matter på forskjellige Withings-profiler. Bare oppdater; du trenger ikke fjerne eller pare noe på nytt. Takk til brukeren som sendte diagnoserapporten som viste akkurat dette."
+  },
   "1.7.11": {
     "en": "Each bed event now records how long it spent between Withings stamping it and your Homey receiving it. If the bed reacts later than you expect, the app log now shows whether the time goes to Withings or to Homey.",
     "no": "Hver sengehendelse noterer nå hvor lang tid den brukte fra Withings stemplet den til Homeyen din mottok den. Reagerer senga senere enn du venter, viser apploggen nå om tiden går hos Withings eller hos Homey."

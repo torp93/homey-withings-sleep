@@ -299,7 +299,6 @@ class SleepAnalyzerDevice extends Homey.Device {
     }
 
     const webhookId = this.homey.app.webhookId;
-    const webhookSecret = this.homey.app.webhookSecret;
 
     try {
       const homeyId = await this.homey.cloud.getHomeyId();
@@ -308,8 +307,10 @@ class SleepAnalyzerDevice extends Homey.Device {
       // all: this string must also be registered verbatim at Withings.
       this._webhookUrl = `https://webhooks.athom.com/webhook/${webhookId}/?homey=${homeyId}`;
 
-      this._webhook = await this.homey.cloud.createWebhook(webhookId, webhookSecret, {});
-      this._webhook.on('message', args => this._onWebhookMessage(args));
+      // The app owns the one webhook and hands every delivery to each device;
+      // see subscribeWebhook in app.js for why a per-device registration
+      // left all but the newest mat deaf.
+      await this.homey.app.subscribeWebhook(this);
 
       // The URL carries the webhook id and this Homey's id. Neither is a
       // secret on its own, but the app log is not the place for either.
@@ -353,16 +354,17 @@ class SleepAnalyzerDevice extends Homey.Device {
       return;
     }
 
-    // One webhook serves the whole Homey; ignore other Withings profiles.
+    // One webhook serves the whole Homey and every device sees every delivery,
+    // so events for another profile or mat are expected here, not faults.
     if (this.userId && event.userId !== String(this.userId)) {
-      this.error(`Webhook for user ${tag(event.userId)} ignored, this device is ${tag(this.userId)}.`);
+      this.log(`Webhook for user ${tag(event.userId)} is for another device, this one is ${tag(this.userId)}.`);
       return;
     }
 
     // Several Sleep Analyzers on one account each have their own device id.
     const boundDevice = this.getStoreValue('deviceId');
     if (boundDevice && event.deviceId && event.deviceId !== boundDevice) {
-      this.error(`Webhook for mat ${tag(event.deviceId)} ignored, this device is ${tag(boundDevice)}.`);
+      this.log(`Webhook for mat ${tag(event.deviceId)} is for another device, this one is ${tag(boundDevice)}.`);
       return;
     }
 
@@ -907,14 +909,15 @@ class SleepAnalyzerDevice extends Homey.Device {
 
   async onUninit() {
     this._stopTimers();
+    this.homey.app.unsubscribeWebhook(this);
   }
 
   async onDeleted() {
     this._stopTimers();
 
-    if (this._webhook) {
-      await this.homey.cloud.unregisterWebhook(this._webhook).catch(this.error);
-    }
+    // Stop listening, but leave the shared webhook to the app: unregistering
+    // it here used to cut off every other mat on this Homey.
+    this.homey.app.unsubscribeWebhook(this);
 
     // The callback URL carries the Homey id, not the device id, so every Sleep
     // device on this Homey subscribes with the same string. Revoking it while

@@ -131,6 +131,68 @@ class WithingsSleepApp extends Homey.App {
     return Boolean(this.webhookId && this.webhookSecret);
   }
 
+  /**
+   * One webhook for the whole app, shared by every Sleep device.
+   *
+   * Every device subscribes Withings with the same callback URL, so they all
+   * need the same deliveries. Registering the webhook per device does not do
+   * that: Homey keeps one registration per webhook id, and each new
+   * createWebhook replaced the previous one. Only the most recently added mat
+   * then received anything, and it discarded the other profiles' events. A
+   * diagnostics report with two mats on two profiles showed exactly that,
+   * flipping the moment the second mat was re-paired. So the app registers once
+   * and hands every delivery to all devices; each device already keeps only
+   * its own profile's and mat's events.
+   */
+  async subscribeWebhook(device) {
+    if (!this.hasWebhookConfig) return false;
+
+    this._webhookDevices = this._webhookDevices || new Set();
+    this._webhookDevices.add(device);
+
+    // Devices initialise in parallel; share the one registration in flight
+    // instead of racing to create several.
+    if (!this._webhookReady) {
+      this._webhookReady = this.homey.cloud.createWebhook(this.webhookId, this.webhookSecret, {})
+        .then(webhook => {
+          webhook.on('message', args => this._dispatchWebhook(args));
+          return webhook;
+        })
+        .catch(err => {
+          // Let the next device try again rather than caching a failure.
+          this._webhookReady = null;
+          throw err;
+        });
+    }
+
+    await this._webhookReady;
+    return true;
+  }
+
+  /**
+   * A deleted device stops listening. The webhook itself stays: the other
+   * devices still rely on it, and an app with no devices simply receives
+   * nothing it has to act on.
+   */
+  unsubscribeWebhook(device) {
+    if (this._webhookDevices) this._webhookDevices.delete(device);
+  }
+
+  _dispatchWebhook(args) {
+    for (const device of this._webhookDevices || []) {
+      // One device failing on a delivery must not keep it from the others.
+      Promise.resolve()
+        .then(() => device._onWebhookMessage(args))
+        .catch(err => this.error(`Webhook delivery to a device failed: ${err.message}`));
+    }
+  }
+
+  async onUninit() {
+    if (!this._webhookReady) return;
+    const webhook = await this._webhookReady.catch(() => null);
+    if (webhook) await this.homey.cloud.unregisterWebhook(webhook).catch(this.error);
+  }
+
   registerFlowCards() {
     this.homey.flow
       .getConditionCard('withings_is_in_bed')
